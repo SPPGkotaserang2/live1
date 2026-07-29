@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SPPG KOTA SERANG 2 - Multi-Media Display Ultimate Grid</title>
+  <title>SPPG KOTA SERANG SERANG SERANG 2 - Multi-Media Display Dynamic</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,7 +12,7 @@
     }
 
     body {
-      background: #001f28; /* Background dasar gelap solid */
+      background: #001f28;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       overflow: hidden;
       color: #fff;
@@ -32,7 +32,6 @@
       background: linear-gradient(135deg, #70c1b3, #87ceeb, #5fa89f);
     }
 
-    /* Sembunyikan Layar Utama Total saat Tahap 1-5 Aktif */
     .screen-container.hidden-screen {
       display: none !important;
     }
@@ -74,7 +73,7 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
-    /* Banner Overlay untuk Aktivasi Suara */
+    /* Banner Overlay Aktivasi Suara */
     #sound-overlay {
       position: fixed;
       bottom: 25px;
@@ -124,9 +123,7 @@
       text-shadow: 0 0 10px rgba(224, 251, 252, 0.5);
     }
 
-    /* ========================================================= */
-    /* OVERLAY STAGE FULLSCREEN SOLID                             */
-    /* ========================================================= */
+    /* STAGE FULLSCREEN OVERLAY */
     .fullscreen-stage-overlay {
       position: fixed;
       top: 0;
@@ -152,7 +149,7 @@
       opacity: 1 !important;
     }
 
-    /* TAHAP 1: LAYAR FULLSCREEN KATA MOTIVASI */
+    /* TAHAP 1: MOTIVASI */
     #fullscreen-quote-screen {
       z-index: 99991;
       text-align: center;
@@ -221,7 +218,7 @@
       border: 1px solid rgba(148, 210, 189, 0.6);
     }
 
-    /* TAHAP 2: LAYAR FULLSCREEN VIDEO KHUSUS */
+    /* TAHAP 2: VIDEO FULLSCREEN */
     #fullscreen-video-overlay {
       z-index: 99992;
       background: #000000 !important;
@@ -235,7 +232,7 @@
       z-index: 2;
     }
 
-    /* TAHAP 3: LAYAR FULLSCREEN GAMBAR KHUSUS */
+    /* TAHAP 3: GAMBAR FULLSCREEN */
     #fullscreen-image-overlay {
       z-index: 99993;
     }
@@ -261,7 +258,7 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
     }
 
-    /* TAHAP 4 & 5: LAYAR FULLSCREEN GALERI 20 KOTAK FOTO */
+    /* TAHAP 4 & 5: GALERI 20 KOTAK FOTO */
     #fullscreen-grid-overlay {
       z-index: 99994;
       padding: 20px;
@@ -356,8 +353,6 @@
 
   <!-- CONTAINER UTAMA 3 LAYAR -->
   <div class="screen-container" id="mainContainer">
-    
-    <!-- LAYAR 1 (KIRI) -->
     <div class="screen" id="screen1">
       <img src="gb1.jpeg" class="media-element active" onerror="handleMediaError(this)">
       <img src="gb2.jpeg" class="media-element" onerror="handleMediaError(this)">
@@ -365,22 +360,12 @@
       <img src="gb4.jpeg" class="media-element" onerror="handleMediaError(this)">
       <img src="gb5.jpeg" class="media-element" onerror="handleMediaError(this)">
       <img src="gb6.jpeg" class="media-element" onerror="handleMediaError(this)">
-      
-      <div class="intro-card fallback-card" style="display: none;">
-        <h2 class="intro-text">"Masa depan diciptakan oleh apa yang Anda lakukan hari ini, bukan besok."</h2>
-      </div>
     </div>
 
-    <!-- LAYAR 2 (TENGAH - PEMUTAR VIDEO) -->
     <div class="screen" id="screen2">
       <video id="normalVideoPlayer" class="media-element active" playsinline muted onerror="handleNormalVideoError(this)"></video>
-
-      <div class="intro-card fallback-card" id="screen2Fallback" style="display: none;">
-        <h2 class="intro-text">"Fokus pada proses, nikmati perjuangan, dan raih keberhasilan bersama."</h2>
-      </div>
     </div>
 
-    <!-- LAYAR 3 (KANAN) -->
     <div class="screen" id="screen3">
       <img src="gb1.jpeg" class="media-element active" onerror="handleMediaError(this)">
       <img src="gb2.jpeg" class="media-element" onerror="handleMediaError(this)">
@@ -388,19 +373,13 @@
       <img src="gb4.jpeg" class="media-element" onerror="handleMediaError(this)">
       <img src="gb5.jpeg" class="media-element" onerror="handleMediaError(this)">
       <img src="gb6.jpeg" class="media-element" onerror="handleMediaError(this)">
-      
-      <div class="intro-card fallback-card" style="display: none;">
-        <h2 class="intro-text">"Inovasi dan semangat tak terbatas menuju masa depan yang gemilang."</h2>
-      </div>
     </div>
-
   </div>
 
-  <!-- TAHAP 1: LAYAR FULLSCREEN KATA-KATA MOTIVASI -->
+  <!-- TAHAP 1: MOTIVASI -->
   <div id="fullscreen-quote-screen" class="fullscreen-stage-overlay">
     <div class="quote-content-wrapper">
       <h1 class="sppg-title">SPPG KOTA SERANG SERANG 2</h1>
-      
       <div class="quote-box">
         <h2 class="quote-text" id="dailyQuote">"Memuat kata-kata motivasi..."</h2>
         <p class="quote-date" id="currentDate"></p>
@@ -408,99 +387,57 @@
     </div>
   </div>
 
-  <!-- TAHAP 2: LAYAR KHUSUS MEMUTAR VIDEO FULLSCREEN -->
+  <!-- TAHAP 2: VIDEO FULLSCREEN -->
   <div id="fullscreen-video-overlay" class="fullscreen-stage-overlay">
     <video id="fullVideoPlayer" playsinline muted></video>
   </div>
 
-  <!-- TAHAP 3: LAYAR KHUSUS MENAMPILKAN GAMBAR FULLSCREEN -->
+  <!-- TAHAP 3: GAMBAR FULLSCREEN -->
   <div id="fullscreen-image-overlay" class="fullscreen-stage-overlay">
-    <img id="fullImagePlayer" src="" alt="Gambar Fullscreen">
+    <img id="fullImagePlayer" src="STR1.jpg" alt="Gambar Fullscreen" onerror="this.src='gb1.jpeg'">
   </div>
 
-  <!-- TAHAP 4 & 5: LAYAR KHUSUS GALERI 20 KOTAK FOTO -->
+  <!-- TAHAP 4 & 5: GALERI 20 FOTO -->
   <div id="fullscreen-grid-overlay" class="fullscreen-stage-overlay">
-    <h1 class="grid-header-title" id="gridHeaderTitle">DOKUMENTASI DAPUR SPPG KOTA SERANG SERANG SERANG 2</h1>
-    <div class="photo-grid-container" id="gridContainer">
-      <!-- 20 Kotak Foto Dimasukkan Otomatis via JS -->
-    </div>
+    <h1 class="grid-header-title" id="gridHeaderTitle">DOKUMENTASI SPPG KOTA SERANG 2</h1>
+    <div class="photo-grid-container" id="gridContainer"></div>
   </div>
 
   <script>
-    let imgInterval1, imgInterval3;
-    
-    // Konfigurasi Durasi Display (dalam milidetik)
     const IMAGE_DISPLAY_TIME = 5000;       
     const QUOTE_DISPLAY_TIME = 15000;      
     const FULL_IMAGE_DISPLAY_TIME = 10000; 
     const GRID_DISPLAY_TIME = 15000;       
 
-    /* DAFTAR 6 VIDEO LOKAL DI LAYAR TENGAH (1.mp4 - 6.mp4) */
-    const normalVideosList = [];
-    for (let i = 1; i <= 6; i++) {
-      normalVideosList.push(`${i}.mp4`);
-    }
-    
+    // Daftar media dinamis (otomatis terupdate via API)
+    let normalVideosList = ['1.mp4', '2.mp4', '3.mp4', '4.mp4', '5.mp4', '6.mp4'];
+    let fullVideosList = ['videofull1.mp4', 'videofull2.mp4', 'videofull3.mp4', 'videofull4.mp4', ];
+    let dapurPhotosList = [];
+    let distribusiPhotosList = [];
     let currentNormalVideoIdx = 0; 
+    let currentFullVideoIdx = 0;
     let isAudioEnabled = false;
 
-    /* ========================================================= */
-    /* DAFTAR VIDEO FULLSCREEN (Tahap 2)                          */
-    /* Masukkan semua nama file video lokal di sini              */
-    /* ========================================================= */
-    const fullVideosList = [
-      'videofull1.mp4',
-      'videofull2.mp4',
-      'videofull3.mp4',
-      'videofull4.mp4'  // Tambahkan baris sesuai jumlah video Anda
-    ];
-    let currentFullVideoIdx = 0;
+    // FUNGSI MEMINDAI / UPDATE MEDIA BARU DARI SERVER
+    async function fetchLatestMediaList() {
+      try {
+        const response = await fetch('/api/media');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.normalVideos && data.normalVideos.length > 0) normalVideosList = data.normalVideos;
+          if (data.fullVideos && data.fullVideos.length > 0) fullVideosList = data.fullVideos;
+          if (data.dapurPhotos && data.dapurPhotos.length > 0) dapurPhotosList = data.dapurPhotos;
+          if (data.distribusiPhotos && data.distribusiPhotos.length > 0) distribusiPhotosList = data.distribusiPhotos;
+        }
+      } catch (err) {
+        console.log("Menjalankan dalam mode offline/statis.");
+      }
+    }
 
-    // LIST FILE GAMBAR KHUSUS FULLSCREEN (Tahap 3)
-    const fullImagesList = [
-      'STR1.jpg',
-    ];
-    let currentFullImageIdx = 0;
-
-    // LIST 1: 20 FOTO DOKUMENTASI DAPUR (Tahap 4)
-    const dapurPhotosList = [
-      'dpr1.jpeg', 'dpr2.jpeg', 'dpr3.jpeg', 'dpr4.jpeg', 'dpr5.jpeg',
-      'dpr6.jpeg', 'dpr7.jpeg', 'dpr8.jpeg', 'dpr9.jpeg', 'dpr10.jpeg',
-      'dpr11.jpeg', 'dpr.jpeg', 'dpr13.jpeg', 'dpr14.jpeg', 'dpr15.jpeg',
-      'dpr16.jpeg', 'dpr17.jpeg', 'dpr18.jpeg', 'dpr19.jpeg', 'dpr20.jpeg'
-    ];
-
-    // LIST 2: 20 FOTO DISTRIBUSI PENERIMA MANFAAT (Tahap 5)
-    const distribusiPhotosList = [
-      '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg',
-      '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg',
-      '11.jpeg', '12.jpeg', '13.jpeg', '14.jpeg', '15.jpeg',
-      '16.jpeg', '17.jpeg', '18.jpeg', '19.jpeg', '20.jpeg'
-    ];
-
-    const subjects = [
-      "Kesuksesan sejati", "Impian besar Anda", "Keberanian tanpa batas", 
-      "Setiap langkah kecil hari ini", "Komitmen dan konsistensi", "Kerja keras yang gigih", 
-      "Kekuatan dalam diri Anda", "Inovasi tanpa henti", "Semangat pantang menyerah"
-    ];
-
-    const actions = [
-      "akan selalu membuka jalan bagi", "merupakan kunci utama untuk membuka", 
-      "selalu melahirkan hasil terbaik dalam", "pasti membawa perubahan luar biasa pada", 
-      "akan menjadi fondasi terkuat bagi", "selalu mampu menembus batas dalam"
-    ];
-
-    const targets = [
-      "masa depan yang jauh lebih cemerlang.", "pencapaian prestasi yang tak terhitung jumlahnya.", 
-      "kemenangan besar yang membanggakan.", "proses menuju puncak keberhasilan.", 
-      "kehidupan yang penuh keberkahan dan kebahagiaan.", "kemajuan yang tak pernah terhentikan."
-    ];
-
-    const inspirations = [
-      "Tetaplah melangkah walau perlahan!", "Percayalah pada proses luar biasa ini!", 
-      "Jadikan hari ini lebih baik dari kemarin!", "Bersama SPPG KOTA SERANG SERANG SERANG 2, kita bisa!", 
-      "Fokus pada tujuan, abai tantangan!", "Keberhasilan sudah di depan mata!"
-    ];
+    const subjects = ["Kesuksesan sejati", "Impian besar Anda", "Keberanian tanpa batas", "Setiap langkah kecil hari ini", "Komitmen dan konsistensi", "Kerja keras yang gigih"];
+    const actions = ["akan selalu membuka jalan bagi", "merupakan kunci utama untuk membuka", "selalu melahirkan hasil terbaik dalam", "pasti membawa perubahan luar biasa pada"];
+    const targets = ["masa depan yang jauh lebih cemerlang.", "pencapaian prestasi yang tak terhitung jumlahnya.", "kemenangan besar yang membanggakan.", "proses menuju puncak keberhasilan."];
+    const inspirations = ["Tetaplah melangkah walau perlahan!", "Percayalah pada proses luar biasa ini!", "Jadikan hari ini lebih baik dari kemarin!", "Bersama SPPG KOTA SERANG SERANG SERANG 2, kita bisa!"];
 
     function generateInfiniteQuote() {
       const s = subjects[Math.floor(Math.random() * subjects.length)];
@@ -521,9 +458,7 @@
     function showStage(element) {
       const mainContainer = document.getElementById('mainContainer');
       if (mainContainer) mainContainer.classList.add('hidden-screen');
-
       hideAllStages(); 
-
       element.style.display = 'flex';
       void element.offsetWidth; 
       element.classList.add('show');
@@ -535,17 +470,17 @@
       if (mainContainer) mainContainer.classList.remove('hidden-screen');
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      imgInterval1 = setupImageSlideshow('screen1', IMAGE_DISPLAY_TIME);
-      imgInterval3 = setupImageSlideshow('screen3', IMAGE_DISPLAY_TIME);
+    window.addEventListener('DOMContentLoaded', async () => {
+      setupImageSlideshow('screen1', IMAGE_DISPLAY_TIME);
+      setupImageSlideshow('screen3', IMAGE_DISPLAY_TIME);
 
       const normalPlayer = document.getElementById('normalVideoPlayer');
       normalPlayer.addEventListener('ended', onNormalVideoEnded);
 
-      // Listener khusus video full diset di fungsi terkait
       const fullPlayer = document.getElementById('fullVideoPlayer');
       fullPlayer.addEventListener('ended', handleFullVideoNext);
 
+      await fetchLatestMediaList();
       playNormalVideoSequence();
 
       document.body.addEventListener('click', enableAudio, { once: true });
@@ -581,25 +516,25 @@
       }, intervalMs);
     }
 
-    function playNormalVideoSequence() {
+    async function playNormalVideoSequence() {
       restoreMainContainer();
       
+      // Sinkronkan daftar file media terbaru sebelum diputar
+      await fetchLatestMediaList();
+
       const normalPlayer = document.getElementById('normalVideoPlayer');
-      const targetSrc = normalVideosList[currentNormalVideoIdx];
+      const targetSrc = normalVideosList[currentNormalVideoIdx] || '1.mp4';
 
       normalPlayer.src = targetSrc;
       normalPlayer.muted = !isAudioEnabled;
 
       normalPlayer.play().catch(e => {
-        console.log(`Video lokal ${targetSrc} tidak dapat diputar, lanjut ke video berikutnya...`);
         handleNormalVideoError();
       });
     }
 
-    /* LOGIKA ALUR: PUTAR 5 VIDEO HINGGA SELESAI BARU PERGI KE TAHAP 1-5 */
     function onNormalVideoEnded() {
       currentNormalVideoIdx++;
-
       if (currentNormalVideoIdx >= normalVideosList.length) {
         currentNormalVideoIdx = 0; 
         showDailyQuoteScreen();    
@@ -616,7 +551,6 @@
       playNormalVideoSequence();
     }
 
-    /* TAHAP 1: Menampilkan Kata Motivasi (15 Detik) */
     function showDailyQuoteScreen() {
       const normalPlayer = document.getElementById('normalVideoPlayer');
       normalPlayer.pause();
@@ -628,9 +562,7 @@
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       document.getElementById('currentDate').innerText = today.toLocaleDateString('id-ID', options);
 
-      const quoteScreen = document.getElementById('fullscreen-quote-screen');
-      showStage(quoteScreen);
-
+      showStage(document.getElementById('fullscreen-quote-screen'));
       speakQuote(newQuote);
 
       setTimeout(() => {
@@ -644,21 +576,21 @@
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'id-ID';
         utterance.rate = 0.9;
-        utterance.pitch = 1.0;
         window.speechSynthesis.speak(utterance);
       }
     }
 
     function closeQuoteAndPlayFullVideo() {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      currentFullVideoIdx = 0; // Mulai pemutaran dari video full pertama
+      currentFullVideoIdx = 0;
       playDedicatedFullVideo();
     }
 
-    /* TAHAP 2: Memutar Video Fullscreen Satu per Satu sampai Selesai Seluruhnya */
-    function playDedicatedFullVideo() {
+    async function playDedicatedFullVideo() {
+      await fetchLatestMediaList(); // Update playlist video full terbaru
+
       if (!fullVideosList || fullVideosList.length === 0) {
-        playDedicatedFullImage(); // Jika list kosong, langsung ke Tahap 3
+        playDedicatedFullImage();
         return;
       }
 
@@ -672,36 +604,24 @@
       showStage(fullOverlay);
 
       fullPlayer.play().catch(e => {
-        console.log(`Gagal memutar video fullscreen: ${targetVideoSrc}, lanjut berikutnya...`, e);
         handleFullVideoNext();
       });
     }
 
-    /* Callback saat video full selesai diputar (ended) atau gagal */
     function handleFullVideoNext() {
       currentFullVideoIdx++;
 
-      // Jika masih ada video dalam list, putar video berikutnya
       if (currentFullVideoIdx < fullVideosList.length) {
         playDedicatedFullVideo();
       } else {
-        // Jika SEMUA video di fullVideosList sudah selesai diputar
         const fullPlayer = document.getElementById('fullVideoPlayer');
         fullPlayer.pause();
-        playDedicatedFullImage(); // Lanjut ke Tahap 3
+        playDedicatedFullImage(); 
       }
     }
 
-    /* TAHAP 3: Menampilkan Gambar Fullscreen Khusus (10 Detik) */
     function playDedicatedFullImage() {
       const imgOverlay = document.getElementById('fullscreen-image-overlay');
-      const imgPlayer = document.getElementById('fullImagePlayer');
-
-      const targetImgSrc = fullImagesList[currentFullImageIdx];
-      currentFullImageIdx = (currentFullImageIdx + 1) % fullImagesList.length;
-
-      imgPlayer.src = targetImgSrc;
-
       showStage(imgOverlay);
 
       setTimeout(() => {
@@ -709,38 +629,36 @@
       }, FULL_IMAGE_DISPLAY_TIME);
     }
 
-    /* TAHAP 4: Menampilkan Layar 20 Kotak Foto DOKUMENTASI DAPUR (15 Detik) */
-    function playDapurGridPhotos() {
-      renderPhotoGrid('DOKUMENTASI DAPUR SPPG KOTA SERANG SERANG 2', dapurPhotosList);
-
-      const gridOverlay = document.getElementById('fullscreen-grid-overlay');
-      showStage(gridOverlay);
+    async function playDapurGridPhotos() {
+      await fetchLatestMediaList();
+      const list = dapurPhotosList.length > 0 ? dapurPhotosList : Array.from({length: 20}, (_, i) => `dpr${i+1}.jpeg`);
+      
+      renderPhotoGrid('DOKUMENTASI DAPUR SPPG KOTA SERANG SERANG SERANG 2', list);
+      showStage(document.getElementById('fullscreen-grid-overlay'));
 
       setTimeout(() => {
         playDistribusiGridPhotos();
       }, GRID_DISPLAY_TIME);
     }
 
-    /* TAHAP 5: Menampilkan Layar 20 Kotak Foto DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT (15 Detik) */
-    function playDistribusiGridPhotos() {
-      renderPhotoGrid('DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT', distribusiPhotosList);
+    async function playDistribusiGridPhotos() {
+      await fetchLatestMediaList();
+      const list = distribusiPhotosList.length > 0 ? distribusiPhotosList : Array.from({length: 20}, (_, i) => `${i+1}.jpeg`);
 
-      const gridOverlay = document.getElementById('fullscreen-grid-overlay');
-      showStage(gridOverlay);
+      renderPhotoGrid('DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT', list);
+      showStage(document.getElementById('fullscreen-grid-overlay'));
 
       setTimeout(() => {
-        // Kembali memutar urutan video utama
         playNormalVideoSequence();
       }, GRID_DISPLAY_TIME);
     }
 
-    /* FUNGSI RENDERING GRID FOTO */
     function renderPhotoGrid(titleText, photosArray) {
       document.getElementById('gridHeaderTitle').innerText = titleText;
       const gridContainer = document.getElementById('gridContainer');
 
       gridContainer.innerHTML = '';
-      photosArray.forEach((photoSrc, index) => {
+      photosArray.slice(0, 20).forEach((photoSrc, index) => {
         const card = document.createElement('div');
         card.className = 'photo-card';
         card.style.transitionDelay = `${index * 0.03}s`;
@@ -751,20 +669,7 @@
 
     function handleMediaError(element) {
       element.style.display = 'none';
-      const parent = element.parentElement;
-      
-      const remainingElements = Array.from(parent.children).filter(el => 
-        (el.tagName === 'IMG' || el.tagName === 'VIDEO') && el.style.display !== 'none'
-      );
-
-      if (remainingElements.length === 0) {
-        const fallbackCard = parent.querySelector('.fallback-card');
-        if (fallbackCard) {
-          fallbackCard.style.display = 'flex';
-        }
-      }
     }
   </script>
-
 </body>
 </html>
