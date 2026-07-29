@@ -614,10 +614,11 @@
   showStage(document.getElementById('fullscreen-grid-overlay'));
 
   setTimeout(() => {
-    // Daripada kembali ke video normal, kita reload browser di sini!
-    // Ini menjamin 1 siklus (Tahap 1-5) selesai sempurna dulu baru di-refresh.
-    window.location.reload(); 
+    // Kembali ke video normal secara mulus tanpa reload halaman
+    // Ini MENCEGAH munculnya tombol "Muat Ulang" dari browser!
+    playNormalVideoSequence(); 
   }, GRID_DISPLAY_TIME);
+}
 }
     function renderPhotoGrid(titleText, photosArray) {
       document.getElementById('gridHeaderTitle').innerText = titleText;
