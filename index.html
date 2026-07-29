@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPPG KOTA SERANG 2 - Multi-Media Display Ultimate Grid</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #001f28; /* Background dasar gelap solid */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      color: #fff;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Layout Utama 3 Tampilan Layar */
+    .screen-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      background: linear-gradient(135deg, #70c1b3, #87ceeb, #5fa89f);
+    }
+
+    /* Sembunyikan Layar Utama Total saat Tahap 1-5 Aktif */
+    .screen-container.hidden-screen {
+      display: none !important;
+    }
+
+    .screen {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background-color: rgba(0, 0, 0, 0.25);
+      border-right: 3px solid rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .screen:last-child {
+      border-right: none;
+    }
+
+    /* Penataan Elemen Media (Gambar & Video Normal) */
+    .media-element {
+      max-width: 96%;
+      max-height: 96%;
+      object-fit: contain;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .media-element.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Banner Overlay untuk Aktivasi Suara */
+    #sound-overlay {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #005f73;
+      border: 2px solid #e0fbfc;
+      border-radius: 30px;
+      padding: 12px 30px;
+      z-index: 100001;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+      animation: bounceOverlay 2s infinite;
+      transition: opacity 0.5s ease;
+    }
+
+    #sound-overlay span {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e0fbfc;
+      letter-spacing: 1px;
+    }
+
+    .intro-card {
+      width: 90%;
+      height: 85%;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+      background: rgba(0, 77, 86, 0.85);
+      border: 2px solid #e0fbfc;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .intro-text {
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1.4;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(224, 251, 252, 0.5);
+    }
+
+    /* ========================================================= */
+    /* OVERLAY STAGE FULLSCREEN SOLID                             */
+    /* ========================================================= */
+    .fullscreen-stage-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('logo.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #001f28; 
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+      z-index: 99990;
+    }
+
+    .fullscreen-stage-overlay.show {
+      display: flex !important;
+      opacity: 1 !important;
+    }
+
+    /* TAHAP 1: LAYAR FULLSCREEN KATA MOTIVASI */
+    #fullscreen-quote-screen {
+      z-index: 99991;
+      text-align: center;
+      padding: 40px;
+    }
+
+    #fullscreen-quote-screen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 31, 40, 0.90);
+      z-index: 1;
+    }
+
+    .quote-content-wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 90%;
+    }
+
+    .sppg-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #94d2bd;
+      letter-spacing: 5px;
+      margin-bottom: 30px;
+      text-shadow: 0 0 25px rgba(148, 210, 189, 0.8), 0 0 40px rgba(224, 251, 252, 0.5);
+      animation: pulseHeader 2s infinite alternate;
+    }
+
+    .quote-box {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 50px 70px;
+      border-radius: 30px;
+      border: 2px solid rgba(224, 251, 252, 0.4);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      max-width: 1100px;
+    }
+
+    .quote-text {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 25px;
+      line-height: 1.4;
+      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+      animation: floatText 4s ease-in-out infinite;
+    }
+
+    .quote-date {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e0fbfc;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      background: rgba(0, 95, 115, 0.9);
+      padding: 8px 24px;
+      border-radius: 20px;
+      display: inline-block;
+      border: 1px solid rgba(148, 210, 189, 0.6);
+    }
+
+    /* TAHAP 2: LAYAR FULLSCREEN VIDEO KHUSUS */
+    #fullscreen-video-overlay {
+      z-index: 99992;
+      background: #000000 !important;
+    }
+
+    #fullscreen-video-overlay video {
+      width: 100vw;
+      height: 100vh;
+      object-fit: fill;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* TAHAP 3: LAYAR FULLSCREEN GAMBAR KHUSUS */
+    #fullscreen-image-overlay {
+      z-index: 99993;
+    }
+
+    #fullscreen-image-overlay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 31, 40, 0.90);
+      z-index: 1;
+    }
+
+    #fullscreen-image-overlay img {
+      width: 90vw;
+      height: 90vh;
+      object-fit: contain;
+      position: relative;
+      z-index: 2;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* TAHAP 4 & 5: LAYAR FULLSCREEN GALERI 20 KOTAK FOTO */
+    #fullscreen-grid-overlay {
+      z-index: 99994;
+      padding: 20px;
+      justify-content: flex-start;
+    }
+
+    #fullscreen-grid-overlay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 31, 40, 0.92);
+      z-index: 1;
+    }
+
+    .grid-header-title {
+      position: relative;
+      z-index: 2;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #e0fbfc;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 15px;
+      text-shadow: 0 0 15px rgba(224, 251, 252, 0.6);
+      text-align: center;
+    }
+
+    .photo-grid-container {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 12px;
+      width: 95vw;
+      height: 82vh;
+    }
+
+    .photo-card {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(224, 251, 252, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      position: relative;
+      opacity: 0;
+      transform: translateY(20px) scale(0.9);
+      transition: all 0.5s ease;
+    }
+
+    #fullscreen-grid-overlay.show .photo-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @keyframes bounceOverlay {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -8px); }
+    }
+
+    @keyframes floatText {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes pulseHeader {
+      0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(148,210,189,0.5)); }
+      100% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(148,210,189,0.9)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BANNER AKTIVASI SUARA -->
+  <div id="sound-overlay" onclick="enableAudio()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e0fbfc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+    </svg>
+    <span>KLIK DI SINI UNTUK AKTIFKAN SUARA MULTIMEDIA & MOTIVASI</span>
+  </div>
+
+  <!-- CONTAINER UTAMA 3 LAYAR -->
+  <div class="screen-container" id="mainContainer">
+    
+    <!-- LAYAR 1 (KIRI) -->
+    <div class="screen" id="screen1">
+      <img src="gb1.jpeg" class="media-element active" onerror="handleMediaError(this)">
+      <img src="gb2.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb3.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb4.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb5.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb6.jpeg" class="media-element" onerror="handleMediaError(this)">
+      
+      <div class="intro-card fallback-card" style="display: none;">
+        <h2 class="intro-text">"Masa depan diciptakan oleh apa yang Anda lakukan hari ini, bukan besok."</h2>
+      </div>
+    </div>
+
+    <!-- LAYAR 2 (TENGAH - PEMUTAR VIDEO) -->
+    <div class="screen" id="screen2">
+      <video id="normalVideoPlayer" class="media-element active" playsinline muted onerror="handleNormalVideoError(this)"></video>
+
+      <div class="intro-card fallback-card" id="screen2Fallback" style="display: none;">
+        <h2 class="intro-text">"Fokus pada proses, nikmati perjuangan, dan raih keberhasilan bersama."</h2>
+      </div>
+    </div>
+
+    <!-- LAYAR 3 (KANAN) -->
+    <div class="screen" id="screen3">
+      <img src="gb1.jpeg" class="media-element active" onerror="handleMediaError(this)">
+      <img src="gb2.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb3.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb4.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb5.jpeg" class="media-element" onerror="handleMediaError(this)">
+      <img src="gb6.jpeg" class="media-element" onerror="handleMediaError(this)">
+      
+      <div class="intro-card fallback-card" style="display: none;">
+        <h2 class="intro-text">"Inovasi dan semangat tak terbatas menuju masa depan yang gemilang."</h2>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAHAP 1: LAYAR FULLSCREEN KATA-KATA MOTIVASI -->
+  <div id="fullscreen-quote-screen" class="fullscreen-stage-overlay">
+    <div class="quote-content-wrapper">
+      <h1 class="sppg-title">SPPG KOTA SERANG SERANG 2</h1>
+      
+      <div class="quote-box">
+        <h2 class="quote-text" id="dailyQuote">"Memuat kata-kata motivasi..."</h2>
+        <p class="quote-date" id="currentDate"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAHAP 2: LAYAR KHUSUS MEMUTAR VIDEO FULLSCREEN -->
+  <div id="fullscreen-video-overlay" class="fullscreen-stage-overlay">
+    <video id="fullVideoPlayer" playsinline muted></video>
+  </div>
+
+  <!-- TAHAP 3: LAYAR KHUSUS MENAMPILKAN GAMBAR FULLSCREEN -->
+  <div id="fullscreen-image-overlay" class="fullscreen-stage-overlay">
+    <img id="fullImagePlayer" src="" alt="Gambar Fullscreen">
+  </div>
+
+  <!-- TAHAP 4 & 5: LAYAR KHUSUS GALERI 20 KOTAK FOTO -->
+  <div id="fullscreen-grid-overlay" class="fullscreen-stage-overlay">
+    <h1 class="grid-header-title" id="gridHeaderTitle">DOKUMENTASI DAPUR SPPG KOTA SERANG SERANG SERANG 2</h1>
+    <div class="photo-grid-container" id="gridContainer">
+      <!-- 20 Kotak Foto Dimasukkan Otomatis via JS -->
+    </div>
+  </div>
+
+  <script>
+    let imgInterval1, imgInterval3;
+    
+    // Konfigurasi Durasi Display (dalam milidetik)
+    const IMAGE_DISPLAY_TIME = 5000;       
+    const QUOTE_DISPLAY_TIME = 15000;      
+    const FULL_IMAGE_DISPLAY_TIME = 10000; 
+    const GRID_DISPLAY_TIME = 15000;       
+
+    /* DAFTAR 5 VIDEO LOKAL DI LAYAR TENGAH (1.mp4 - 5.mp4) */
+    const normalVideosList = [];
+    for (let i = 1; i <= 5; i++) {
+      normalVideosList.push(`${i}.mp4`);
+    }
+    
+    let currentNormalVideoIdx = 0; 
+    let isAudioEnabled = false;
+
+    /* ========================================================= */
+    /* DAFTAR VIDEO FULLSCREEN (Tahap 2)                          */
+    /* Masukkan semua nama file video lokal di sini              */
+    /* ========================================================= */
+    const fullVideosList = [
+      'videofull1.mp4',
+      'videofull2.mp4',
+      'videofull3.mp4'  // Tambahkan baris sesuai jumlah video Anda
+    ];
+    let currentFullVideoIdx = 0;
+
+    // LIST FILE GAMBAR KHUSUS FULLSCREEN (Tahap 3)
+    const fullImagesList = [
+      'STR1.jpg',
+    ];
+    let currentFullImageIdx = 0;
+
+    // LIST 1: 20 FOTO DOKUMENTASI DAPUR (Tahap 4)
+    const dapurPhotosList = [
+      'dpr1.jpeg', 'dpr2.jpeg', 'dpr3.jpeg', 'dpr4.jpeg', 'dpr5.jpeg',
+      'dpr6.jpeg', 'dpr7.jpeg', 'dpr8.jpeg', 'dpr9.jpeg', 'dpr10.jpeg',
+      'dpr11.jpeg', 'dpr.jpeg', 'dpr13.jpeg', 'dpr14.jpeg', 'dpr15.jpeg',
+      'dpr16.jpeg', 'dpr17.jpeg', 'dpr18.jpeg', 'dpr19.jpeg', 'dpr20.jpeg'
+    ];
+
+    // LIST 2: 20 FOTO DISTRIBUSI PENERIMA MANFAAT (Tahap 5)
+    const distribusiPhotosList = [
+      '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg',
+      '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg',
+      '11.jpeg', '12.jpeg', '13.jpeg', '14.jpeg', '15.jpeg',
+      '16.jpeg', '17.jpeg', '18.jpeg', '19.jpeg', '20.jpeg'
+    ];
+
+    const subjects = [
+      "Kesuksesan sejati", "Impian besar Anda", "Keberanian tanpa batas", 
+      "Setiap langkah kecil hari ini", "Komitmen dan konsistensi", "Kerja keras yang gigih", 
+      "Kekuatan dalam diri Anda", "Inovasi tanpa henti", "Semangat pantang menyerah"
+    ];
+
+    const actions = [
+      "akan selalu membuka jalan bagi", "merupakan kunci utama untuk membuka", 
+      "selalu melahirkan hasil terbaik dalam", "pasti membawa perubahan luar biasa pada", 
+      "akan menjadi fondasi terkuat bagi", "selalu mampu menembus batas dalam"
+    ];
+
+    const targets = [
+      "masa depan yang jauh lebih cemerlang.", "pencapaian prestasi yang tak terhitung jumlahnya.", 
+      "kemenangan besar yang membanggakan.", "proses menuju puncak keberhasilan.", 
+      "kehidupan yang penuh keberkahan dan kebahagiaan.", "kemajuan yang tak pernah terhentikan."
+    ];
+
+    const inspirations = [
+      "Tetaplah melangkah walau perlahan!", "Percayalah pada proses luar biasa ini!", 
+      "Jadikan hari ini lebih baik dari kemarin!", "Bersama SPPG KOTA SERANG SERANG SERANG 2, kita bisa!", 
+      "Fokus pada tujuan, abai tantangan!", "Keberhasilan sudah di depan mata!"
+    ];
+
+    function generateInfiniteQuote() {
+      const s = subjects[Math.floor(Math.random() * subjects.length)];
+      const a = actions[Math.floor(Math.random() * actions.length)];
+      const t = targets[Math.floor(Math.random() * targets.length)];
+      const i = inspirations[Math.floor(Math.random() * inspirations.length)];
+      return `${s} ${a} ${t} ${i}`;
+    }
+
+    function hideAllStages() {
+      const overlays = document.querySelectorAll('.fullscreen-stage-overlay');
+      overlays.forEach(overlay => {
+        overlay.classList.remove('show');
+        overlay.style.display = 'none';
+      });
+    }
+
+    function showStage(element) {
+      const mainContainer = document.getElementById('mainContainer');
+      if (mainContainer) mainContainer.classList.add('hidden-screen');
+
+      hideAllStages(); 
+
+      element.style.display = 'flex';
+      void element.offsetWidth; 
+      element.classList.add('show');
+    }
+
+    function restoreMainContainer() {
+      hideAllStages();
+      const mainContainer = document.getElementById('mainContainer');
+      if (mainContainer) mainContainer.classList.remove('hidden-screen');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      imgInterval1 = setupImageSlideshow('screen1', IMAGE_DISPLAY_TIME);
+      imgInterval3 = setupImageSlideshow('screen3', IMAGE_DISPLAY_TIME);
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      normalPlayer.addEventListener('ended', onNormalVideoEnded);
+
+      // Listener khusus video full diset di fungsi terkait
+      const fullPlayer = document.getElementById('fullVideoPlayer');
+      fullPlayer.addEventListener('ended', handleFullVideoNext);
+
+      playNormalVideoSequence();
+
+      document.body.addEventListener('click', enableAudio, { once: true });
+    });
+
+    function enableAudio() {
+      if (isAudioEnabled) return;
+      isAudioEnabled = true;
+
+      const overlay = document.getElementById('sound-overlay');
+      if (overlay) overlay.style.display = 'none';
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      const fullPlayer = document.getElementById('fullVideoPlayer');
+
+      normalPlayer.muted = false;
+      fullPlayer.muted = false;
+
+      normalPlayer.play().catch(e => console.log(e));
+    }
+
+    function setupImageSlideshow(screenId, intervalMs) {
+      const screen = document.getElementById(screenId);
+      let currentIndex = 0;
+
+      return setInterval(() => {
+        const validImages = Array.from(screen.querySelectorAll('img')).filter(img => img.style.display !== 'none');
+        if (validImages.length <= 1) return;
+
+        validImages[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % validImages.length;
+        validImages[currentIndex].classList.add('active');
+      }, intervalMs);
+    }
+
+    function playNormalVideoSequence() {
+      restoreMainContainer();
+      
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      const targetSrc = normalVideosList[currentNormalVideoIdx];
+
+      normalPlayer.src = targetSrc;
+      normalPlayer.muted = !isAudioEnabled;
+
+      normalPlayer.play().catch(e => {
+        console.log(`Video lokal ${targetSrc} tidak dapat diputar, lanjut ke video berikutnya...`);
+        handleNormalVideoError();
+      });
+    }
+
+    /* LOGIKA ALUR: PUTAR 5 VIDEO HINGGA SELESAI BARU PERGI KE TAHAP 1-5 */
+    function onNormalVideoEnded() {
+      currentNormalVideoIdx++;
+
+      if (currentNormalVideoIdx >= normalVideosList.length) {
+        currentNormalVideoIdx = 0; 
+        showDailyQuoteScreen();    
+      } else {
+        playNormalVideoSequence(); 
+      }
+    }
+
+    function handleNormalVideoError() {
+      currentNormalVideoIdx++;
+      if (currentNormalVideoIdx >= normalVideosList.length) {
+        currentNormalVideoIdx = 0;
+      }
+      playNormalVideoSequence();
+    }
+
+    /* TAHAP 1: Menampilkan Kata Motivasi (15 Detik) */
+    function showDailyQuoteScreen() {
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      normalPlayer.pause();
+
+      const newQuote = generateInfiniteQuote();
+      document.getElementById('dailyQuote').innerText = `"${newQuote}"`;
+      
+      const today = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('currentDate').innerText = today.toLocaleDateString('id-ID', options);
+
+      const quoteScreen = document.getElementById('fullscreen-quote-screen');
+      showStage(quoteScreen);
+
+      speakQuote(newQuote);
+
+      setTimeout(() => {
+        closeQuoteAndPlayFullVideo();
+      }, QUOTE_DISPLAY_TIME);
+    }
+
+    function speakQuote(text) {
+      if ('speechSynthesis' in window && isAudioEnabled) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'id-ID';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function closeQuoteAndPlayFullVideo() {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      currentFullVideoIdx = 0; // Mulai pemutaran dari video full pertama
+      playDedicatedFullVideo();
+    }
+
+    /* TAHAP 2: Memutar Video Fullscreen Satu per Satu sampai Selesai Seluruhnya */
+    function playDedicatedFullVideo() {
+      if (!fullVideosList || fullVideosList.length === 0) {
+        playDedicatedFullImage(); // Jika list kosong, langsung ke Tahap 3
+        return;
+      }
+
+      const fullOverlay = document.getElementById('fullscreen-video-overlay');
+      const fullPlayer = document.getElementById('fullVideoPlayer');
+
+      const targetVideoSrc = fullVideosList[currentFullVideoIdx];
+      fullPlayer.src = targetVideoSrc;
+      fullPlayer.muted = !isAudioEnabled;
+
+      showStage(fullOverlay);
+
+      fullPlayer.play().catch(e => {
+        console.log(`Gagal memutar video fullscreen: ${targetVideoSrc}, lanjut berikutnya...`, e);
+        handleFullVideoNext();
+      });
+    }
+
+    /* Callback saat video full selesai diputar (ended) atau gagal */
+    function handleFullVideoNext() {
+      currentFullVideoIdx++;
+
+      // Jika masih ada video dalam list, putar video berikutnya
+      if (currentFullVideoIdx < fullVideosList.length) {
+        playDedicatedFullVideo();
+      } else {
+        // Jika SEMUA video di fullVideosList sudah selesai diputar
+        const fullPlayer = document.getElementById('fullVideoPlayer');
+        fullPlayer.pause();
+        playDedicatedFullImage(); // Lanjut ke Tahap 3
+      }
+    }
+
+    /* TAHAP 3: Menampilkan Gambar Fullscreen Khusus (10 Detik) */
+    function playDedicatedFullImage() {
+      const imgOverlay = document.getElementById('fullscreen-image-overlay');
+      const imgPlayer = document.getElementById('fullImagePlayer');
+
+      const targetImgSrc = fullImagesList[currentFullImageIdx];
+      currentFullImageIdx = (currentFullImageIdx + 1) % fullImagesList.length;
+
+      imgPlayer.src = targetImgSrc;
+
+      showStage(imgOverlay);
+
+      setTimeout(() => {
+        playDapurGridPhotos();
+      }, FULL_IMAGE_DISPLAY_TIME);
+    }
+
+    /* TAHAP 4: Menampilkan Layar 20 Kotak Foto DOKUMENTASI DAPUR (15 Detik) */
+    function playDapurGridPhotos() {
+      renderPhotoGrid('DOKUMENTASI DAPUR SPPG KOTA SERANG SERANG 2', dapurPhotosList);
+
+      const gridOverlay = document.getElementById('fullscreen-grid-overlay');
+      showStage(gridOverlay);
+
+      setTimeout(() => {
+        playDistribusiGridPhotos();
+      }, GRID_DISPLAY_TIME);
+    }
+
+    /* TAHAP 5: Menampilkan Layar 20 Kotak Foto DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT (15 Detik) */
+    function playDistribusiGridPhotos() {
+      renderPhotoGrid('DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT', distribusiPhotosList);
+
+      const gridOverlay = document.getElementById('fullscreen-grid-overlay');
+      showStage(gridOverlay);
+
+      setTimeout(() => {
+        // Kembali memutar urutan video utama
+        playNormalVideoSequence();
+      }, GRID_DISPLAY_TIME);
+    }
+
+    /* FUNGSI RENDERING GRID FOTO */
+    function renderPhotoGrid(titleText, photosArray) {
+      document.getElementById('gridHeaderTitle').innerText = titleText;
+      const gridContainer = document.getElementById('gridContainer');
+
+      gridContainer.innerHTML = '';
+      photosArray.forEach((photoSrc, index) => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        card.style.transitionDelay = `${index * 0.03}s`;
+        card.innerHTML = `<img src="${photoSrc}" onerror="this.src='gb1.jpeg'">`;
+        gridContainer.appendChild(card);
+      });
+    }
+
+    function handleMediaError(element) {
+      element.style.display = 'none';
+      const parent = element.parentElement;
+      
+      const remainingElements = Array.from(parent.children).filter(el => 
+        (el.tagName === 'IMG' || el.tagName === 'VIDEO') && el.style.display !== 'none'
+      );
+
+      if (remainingElements.length === 0) {
+        const fallbackCard = parent.querySelector('.fallback-card');
+        if (fallbackCard) {
+          fallbackCard.style.display = 'flex';
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>
