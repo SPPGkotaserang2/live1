@@ -610,14 +610,12 @@
     }
 
     function playDistribusiGridPhotos() {
-  renderPhotoGrid('DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT', distribusiPhotosList);
-  showStage(document.getElementById('fullscreen-grid-overlay'));
+      renderPhotoGrid('DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT', distribusiPhotosList);
+      showStage(document.getElementById('fullscreen-grid-overlay'));
 
-  setTimeout(() => {
-    // Kembali ke video normal secara mulus tanpa reload halaman
-    // Ini MENCEGAH munculnya tombol "Muat Ulang" dari browser!
-    playNormalVideoSequence(); 
-  }, GRID_DISPLAY_TIME);
+      setTimeout(() => {
+        playNormalVideoSequence();
+      }, GRID_DISPLAY_TIME);
 }
 }
     function renderPhotoGrid(titleText, photosArray) {
