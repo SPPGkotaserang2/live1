@@ -609,7 +609,7 @@
   </div>
 
   <!-- PANEL TOMBOL TES SIMULASI KANAN ATAS -->
-  <!--<div class="test-panel">
+  <!--div class="test-panel">
     <div style="font-size:0.75rem; font-weight:bold; color:#00f5d4; text-align:center; margin-bottom:2px;">TES ADZAN</div>
     <div class="test-row">
       <button class="btn-test" onclick="testAdzan('SUBUH')">SUBUH</button>
@@ -708,14 +708,19 @@
     let gameTimeout2 = null;
 
     let sidePhotosList = ['gb1.jpeg', 'gb2.jpeg', 'gb3.jpeg', 'gb4.jpeg', 'gb5.jpeg', 'gb6.jpeg'];
-    let normalVideosList = ['1.mp4', '2.mp4', '3.mp4', '4.mp4', '5.mp4', '6.mp4', '7.mp4'];
-    let fullVideosList = ['videofull1.mp4', 'videofull2.mp4','videofull3.mp4','videofull4.mp4',];
+    let normalVideosList = ['1.mp4', '2.mp4', '3.mp4', '4.mp4', '5.mp4', '6.mp4', '7.mp4' ];
+    
+    // ARRAY VIDEO FULLSCREEN - Semua video dalam daftar ini akan diputar berurutan
+    let fullVideosList = ['videofull1.mp4', 'videofull2.mp4', 'videofull3.mp4', 'videofull4.mp4'];
+    
+    // ARRAY FOTO DAPUR (Penulisan diperbaiki)
     let dapurPhotosList = [
       'dpr1.jpeg', 'dpr2.jpeg', 'dpr3.jpeg', 'dpr4.jpeg', 'dpr5.jpeg',
       'dpr6.jpeg', 'dpr7.jpeg', 'dpr8.jpeg', 'dpr9.jpeg', 'dpr10.jpeg',
       'dpr11.jpeg', 'dpr12.jpeg', 'dpr13.jpeg', 'dpr14.jpeg', 'dpr15.jpeg',
       'dpr16.jpeg', 'dpr17.jpeg', 'dpr18.jpeg', 'dpr19.jpeg', 'dpr20.jpeg'
     ];
+    
     let distribusiPhotosList = [
       '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg',
       '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg',
@@ -1167,6 +1172,7 @@
       const qObj = generateUniqueEducationalQuestion();
 
       if (!qObj) {
+        currentFullVideoIdx = 0; // Reset index video saat masuk tahap video
         showFullVideoStage();
         return;
       }
@@ -1206,35 +1212,49 @@
       }, 12000);
 
       gameTimeout2 = setTimeout(() => {
-        if (!isAdzanPlaying) showFullVideoStage();
+        if (!isAdzanPlaying) {
+          currentFullVideoIdx = 0; // Reset ke video pertama sebelum memulai urutan video
+          showFullVideoStage();
+        }
       }, GAME_DISPLAY_TIME);
     }
 
     // =========================================================================
-    // TAHAP 2: VIDEO FULLSCREEN
+    // TAHAP 2: VIDEO FULLSCREEN (DIPERBAIKI: DIPUTAR BERURUTAN SAMPAI HABIS)
     // =========================================================================
     function showFullVideoStage() {
       if (isAdzanPlaying) return;
 
+      // Jika semua video di fullVideosList sudah selesai diputar, lanjut ke Gambar Fullscreen
+      if (!fullVideosList || fullVideosList.length === 0 || currentFullVideoIdx >= fullVideosList.length) {
+        currentFullVideoIdx = 0; // Reset index untuk siklus berikutnya
+        showFullImageStage();
+        return;
+      }
+
       const videoOverlay = document.getElementById('fullscreen-video-overlay');
       const fullPlayer = document.getElementById('fullVideoPlayer');
 
-      const videoSrc = fullVideosList[currentFullVideoIdx] || fullVideosList[0];
-      fullPlayer.src = videoSrc;
+      // Ambil file video sesuai dengan index yang sedang aktif
+      fullPlayer.src = fullVideosList[currentFullVideoIdx];
       fullPlayer.muted = !isAudioEnabled;
 
       showStage(videoOverlay);
 
       const playPromise = fullPlayer.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => handleFullVideoNext());
+        playPromise.catch(err => {
+          console.log(`Gagal memutar ${fullVideosList[currentFullVideoIdx]}:`, err);
+          handleFullVideoNext(); // Jika ada video yang hilang/error, lewati ke video berikutnya
+        });
       }
     }
 
+    // Dipanggil saat video fullscreen selesai atau error
     function handleFullVideoNext() {
       if (isAdzanPlaying) return;
-      currentFullVideoIdx = (currentFullVideoIdx + 1) % fullVideosList.length;
-      showFullImageStage();
+      currentFullVideoIdx++; // Tambahkan index agar memutar video berikutnya (videofull1 -> videofull2 -> dst)
+      showFullVideoStage();  // Panggil kembali untuk cek/putar video selanjutnya
     }
 
     // =========================================================================
@@ -1294,5 +1314,3 @@
       }, GRID_DISPLAY_TIME);
     }
   </script>
-</body>
-</html>
