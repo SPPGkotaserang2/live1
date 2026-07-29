@@ -334,12 +334,6 @@
   
 
   <script>
-    // Auto Refresh Halaman Otomatis Setiap 10 Menit (600.000 ms)
-// Sesuaikan angkanya dengan total durasi 1 siklus tayangan Anda
-setInterval(() => {
-  console.log("Melakukan auto-refresh halaman untuk memperbarui daftar media...");
-  window.location.reload();
-}, 300000); // 300000 ms = 5 menit
 
     // DURASI WAKTU TAMPILAN (Milidetik)
     const IMAGE_DISPLAY_TIME = 5000;       // Durasi slide foto Layar 1 & 3 (5 Detik)
@@ -369,7 +363,7 @@ setInterval(() => {
       '4.mp4',
       '5.mp4',
       '6.mp4',
-      '7.mp4',
+      '7.mp4'
     ];
 
     // 3. Video Fullscreen (Tahap 2)
@@ -616,14 +610,15 @@ setInterval(() => {
     }
 
     function playDistribusiGridPhotos() {
-      renderPhotoGrid('DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT', distribusiPhotosList);
-      showStage(document.getElementById('fullscreen-grid-overlay'));
+  renderPhotoGrid('DOKUMENTASI DISTRIBUSI PENERIMA MANFAAT', distribusiPhotosList);
+  showStage(document.getElementById('fullscreen-grid-overlay'));
 
-      setTimeout(() => {
-        playNormalVideoSequence();
-      }, GRID_DISPLAY_TIME);
-    }
-
+  setTimeout(() => {
+    // Daripada kembali ke video normal, kita reload browser di sini!
+    // Ini menjamin 1 siklus (Tahap 1-5) selesai sempurna dulu baru di-refresh.
+    window.location.reload(); 
+  }, GRID_DISPLAY_TIME);
+}
     function renderPhotoGrid(titleText, photosArray) {
       document.getElementById('gridHeaderTitle').innerText = titleText;
       const gridContainer = document.getElementById('gridContainer');
