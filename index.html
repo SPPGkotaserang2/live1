@@ -331,7 +331,16 @@
     <div class="photo-grid-container" id="gridContainer"></div>
   </div>
 
+  
+
   <script>
+    // Auto Refresh Halaman Otomatis Setiap 10 Menit (600.000 ms)
+// Sesuaikan angkanya dengan total durasi 1 siklus tayangan Anda
+setInterval(() => {
+  console.log("Melakukan auto-refresh halaman untuk memperbarui daftar media...");
+  window.location.reload();
+}, 300000); // 300000 ms = 5 menit
+
     // DURASI WAKTU TAMPILAN (Milidetik)
     const IMAGE_DISPLAY_TIME = 5000;       // Durasi slide foto Layar 1 & 3 (5 Detik)
     const QUOTE_DISPLAY_TIME = 15000;      // Durasi Motivasi (15 Detik)
