@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 Layar Interactive Keren</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000000;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Layout Grid 3 Layar Presisi */
+        .grid-container {
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 8px;
+        }
+
+        .screen-card {
+            position: relative;
+            background: #050505;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #1a1a1a;
+            perspective: 1000px;
+        }
+
+        /* ================================================================== */
+        /* LAYAR 1: GAMBAR TRANSISI KEREN (3D Flip Zoom) */
+        /* ================================================================== */
+        .img-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .img-full {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000000;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-in-out;
+            transform: scale(1) rotateY(0deg);
+            opacity: 1;
+            position: absolute;
+        }
+
+        .img-cool-transition {
+            transform: scale(0.85) rotateY(90deg);
+            opacity: 0;
+        }
+
+        /* ================================================================== */
+        /* LAYAR 2: VIDEO TRANSISI SCROLL */
+        /* ================================================================== */
+        .video-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-full {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000000;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .video-scroll-out {
+            transform: translateY(-100%);
+        }
+        .video-scroll-in {
+            animation: scrollIn 0.5s forwards;
+        }
+
+        @keyframes scrollIn {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* ================================================================== */
+        /* LAYAR 3: WEB AUTO-SCROLL + FULL MODE INTERAKTIF */
+        /* ================================================================== */
+        .web-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .web-toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 99;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .web-toggle-btn:hover {
+            background: #00ffcc;
+            color: #000;
+        }
+
+        .web-frame-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .web-full {
+            width: 100%;
+            height: 200%;
+            border: none;
+            display: block;
+            pointer-events: auto;
+        }
+
+        .web-full-scale {
+            width: 150% !important;
+            height: 150% !important;
+            transform: scale(0.67);
+            transform-origin: top left;
+        }
+
+        /* OVERLAY AKTIVASI AWAL */
+        #startOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            cursor: pointer;
+        }
+
+        #startOverlay h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        #startOverlay p {
+            font-size: 14px;
+            color: #888888;
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY MULAI -->
+    <div id="startOverlay">
+        <h1>KLIK DI SINI UNTUK MEMULAI</h1>
+        <p>Aktivasi pemutaran otomatis 3 layar</p>
+    </div>
+
+    <div class="grid-container">
+
+        <!-- LAYAR 1: GAMBAR TRANSISI KEREN (5 DETIK) -->
+        <div class="screen-card">
+            <div class="img-container">
+                <img class="img-full" id="imgDisplay" src="gambar1.jpeg" alt="Slide Gambar">
+            </div>
+        </div>
+
+        <!-- LAYAR 2: VIDEO SCROLL PLAYLIST LOOP -->
+        <div class="screen-card">
+            <div class="video-wrapper">
+                <video class="video-full" id="mainVideo" playsinline preload="auto"></video>
+            </div>
+        </div>
+
+        <!-- LAYAR 3: WEBSITE AUTO-SCROLL -->
+        <div class="screen-card">
+            <div class="web-container">
+                <button class="web-toggle-btn" id="btnToggleFull">🔍 Tampilan Full Web</button>
+                <div class="web-frame-wrapper" id="webWrapper">
+                    <iframe class="web-full" id="webDisplay" src="https://zgvxw48.s.gy/stock-opname"></iframe>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // =====================================================================
+        // 1. PENGATURAN LAYAR 1: GAMBAR (5 DETIK)
+        // =====================================================================
+        const daftarGambar = [
+            "gambar1.jpeg",
+            "gambar2.jpeg",
+            "gambar3.jpeg"
+        ];
+
+        let indexGambar = 0;
+        const imgDisplay = document.getElementById('imgDisplay');
+
+        function jalankanSlideGambarKeren() {
+            setInterval(() => {
+                imgDisplay.classList.add('img-cool-transition');
+
+                setTimeout(() => {
+                    indexGambar = (indexGambar + 1) % daftarGambar.length;
+                    imgDisplay.src = daftarGambar[indexGambar];
+                    imgDisplay.classList.remove('img-cool-transition');
+                }, 400);
+            }, 5000);
+        }
+
+
+        // =====================================================================
+        // 2. PENGATURAN LAYAR 2: VIDEO LOOP ANTI-MACET (SISTEM RE-INIT)
+        // =====================================================================
+        const daftarVideo = [
+            "video1.mp4",
+            "video2.mp4",
+            "video3.mp4"
+        ];
+
+        let indexVideo = 0;
+        const mainVideo = document.getElementById('mainVideo');
+
+        function memutarVideoByIndex(idx) {
+            // Hentikan video lama & ganti source
+            mainVideo.pause();
+            mainVideo.src = daftarVideo[idx];
+            mainVideo.load(); // Paksa browser membaca file video baru/ulang
+            mainVideo.currentTime = 0;
+            mainVideo.muted = false;
+
+            const playPromise = mainVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Jika diblokir kebijakan audio browser, jalankan muted
+                    mainVideo.muted = true;
+                    mainVideo.play();
+                });
+            }
+        }
+
+        // Pemicu saat video selesai
+        mainVideo.onended = function() {
+            // 1. Jalankan animasi scroll out
+            mainVideo.classList.add('video-scroll-out');
+
+            setTimeout(() => {
+                // 2. Geser index (Jika sudah di video terakhir, otomatis kembali ke 0)
+                indexVideo++;
+                if (indexVideo >= daftarVideo.length) {
+                    indexVideo = 0; // RESET KEMBALI KE VIDEO PERTAMA
+                }
+
+                // 3. Putar video baru/video pertama
+                memutarVideoByIndex(indexVideo);
+
+                // 4. Efek animasi scroll in
+                mainVideo.classList.remove('video-scroll-out');
+                mainVideo.classList.add('video-scroll-in');
+
+                setTimeout(() => {
+                    mainVideo.classList.remove('video-scroll-in');
+                }, 500);
+            }, 400);
+        };
+
+
+        // =====================================================================
+        // 3. PENGATURAN LAYAR 3: AUTO-SCROLL WEB
+        // =====================================================================
+        const webWrapper = document.getElementById('webWrapper');
+        const webDisplay = document.getElementById('webDisplay');
+        const btnToggleFull = document.getElementById('btnToggleFull');
+
+        let posisiScroll = 0;
+        let arahTurun = true;
+        let isUserInteracting = true;
+        let isFullScaled = true;
+        const kecepatanScroll = 0.5;
+
+        function jalankanAutoScrollWeb() {
+            setInterval(() => {
+                if (isUserInteracting) return;
+
+                const maxScroll = webWrapper.scrollHeight - webWrapper.clientHeight;
+
+                if (arahTurun) {
+                    posisiScroll += kecepatanScroll;
+                    if (posisiScroll >= maxScroll) arahTurun = false;
+                } else {
+                    posisiScroll -= kecepatanScroll;
+                    if (posisiScroll <= 0) arahTurun = true;
+                }
+
+                webWrapper.scrollTop = posisiScroll;
+            }, 30);
+        }
+
+        webWrapper.addEventListener('mouseenter', () => isUserInteracting = true);
+        webWrapper.addEventListener('mouseleave', () => {
+            isUserInteracting = false;
+            posisiScroll = webWrapper.scrollTop;
+        });
+
+        btnToggleFull.addEventListener('click', () => {
+            isFullScaled = !isFullScaled;
+            if (isFullScaled) {
+                webDisplay.classList.add('web-full-scale');
+                btnToggleFull.innerText = "🔍 Tampilan Normal";
+            } else {
+                webDisplay.classList.remove('web-full-scale');
+                btnToggleFull.innerText = "🔍 Tampilan Full Web";
+            }
+        });
+
+
+        // =====================================================================
+        // START KICK-OFF
+        // =====================================================================
+        const startOverlay = document.getElementById('startOverlay');
+
+        startOverlay.addEventListener('click', () => {
+            startOverlay.style.display = 'none';
+
+            jalankanSlideGambarKeren();
+            memutarVideoByIndex(0); // Mulai pemutaran video pertama
+            jalankanAutoScrollWeb();
+        });
+    </script>
+
+</body>
+</html>
