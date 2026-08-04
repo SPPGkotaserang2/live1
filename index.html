@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPPG KOTA SERANG SERANG SERANG 2 - Multi-Media Display</title>
+  
+  <!-- SCRIPT KHUSUS TEXT TO SPEECH AGAR SUARA KELUAR DI SMART TV -->
+  <script src="https://code.responsivevoice.org/responsivevoice.js?key=free"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -95,49 +99,6 @@
       font-weight: 700;
       color: #e0fbfc;
       pointer-events: none;
-    }
-
-    /* MENU NAVIGASI TOMBOL MANUAL */
-    .nav-panel {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 100003;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      background: rgba(0, 31, 40, 0.85);
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(5px);
-    }
-
-    .nav-panel-title {
-      font-size: 0.75rem;
-      font-weight: bold;
-      color: #00f5d4;
-      text-align: center;
-      margin-bottom: 2px;
-    }
-
-    .btn-nav {
-      background: #005f73;
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: left;
-    }
-
-    .btn-nav:hover {
-      background: #0a9396;
-      border-color: #00f5d4;
-      transform: translateX(3px);
     }
 
     .fullscreen-stage-overlay {
@@ -602,19 +563,6 @@
     .wave-bar:nth-child(6) { animation-delay: 0.4s; }
     .wave-bar:nth-child(7) { animation-delay: 0.2s; }
 
-    .btn-stop-adzan {
-      position: relative;
-      z-index: 10;
-      background: rgba(230, 57, 70, 0.85);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      padding: 8px 24px;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
     @keyframes pulseGlow {
       0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
       50% { transform: translate(-50%, -50%) scale(1.35); opacity: 1; }
@@ -634,7 +582,7 @@
 <body onclick="globalUserGestureActivation()">
 
   <div id="sound-overlay" onclick="enableAudio(event)">
-    <span>🔊 KLIK DI SINI UNTUK AKTIFKAN SUARA MULTIMEDIA</span>
+    <span>🔊 KLIK / TEKAN OK UNTUK AKTIFKAN SUARA MULTIMEDIA</span>
   </div>
 
   <div class="screen-container" id="mainContainer">
@@ -685,7 +633,6 @@
 
   <div id="adzan-overlay" class="fullscreen-stage-overlay">
     <div class="visual-stage-container">
-      
       <div class="adzan-display-info">
         <div class="adzan-sppg-name">SPPG KOTA SERANG SERANG SERANG 2</div>
         <div class="adzan-status-title" id="adzanStatusTitle">MENGUMANDANGKAN ADZAN DZUHUR</div>
@@ -713,9 +660,6 @@
       <audio id="adzanAudioPlayer" preload="auto"></audio>
     </div>
   </div>
-
-  <!-- Audio Player khusus Fallback TTS TV -->
-  <audio id="ttsAudioPlayer" style="display:none;"></audio>
 
   <script>
     const IMAGE_DISPLAY_TIME = 5000;       
@@ -892,116 +836,47 @@
       }
     }
 
-    /* SISTEM BACA SUARA TEKS HYBRID (DIBAIKAN UNTUK TV & LAPTOP) */
+    /* PEMBERSIH & BACA TEKS DENGAN RESPONSIVE VOICE (KOMPATIBEL DENGAN TV) */
     function speakTextDirect(text, onEndCallback) {
       if (!isAudioEnabled) {
         if (typeof onEndCallback === 'function') onEndCallback();
         return;
       }
 
-      // Hentikan suara lain jika sedang diputar
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      const ttsAudio = document.getElementById('ttsAudioPlayer');
-      if (ttsAudio) {
-        ttsAudio.pause();
-        ttsAudio.currentTime = 0;
+      // Hentikan pembacaan teks sebelumnya
+      if (window.responsiveVoice) {
+        window.responsiveVoice.cancel();
       }
 
-      // Cek ketersediaan voice Indonesia native
-      let hasIndoVoice = false;
-      if ('speechSynthesis' in window) {
-        const voices = window.speechSynthesis.getVoices();
-        hasIndoVoice = voices.some(v => v.lang.includes('id') || v.lang.includes('ID'));
-      }
-
-      // Jika Web Speech API didukung DAN ada voice Bahasa Indonesia (misal di PC/HP)
-      if ('speechSynthesis' in window && hasIndoVoice) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'id-ID';
-        utterance.rate = 0.92;
-
-        if (typeof onEndCallback === 'function') {
-          utterance.onend = onEndCallback;
-          utterance.onerror = () => speakTextFallbackAudio(text, onEndCallback);
-        }
-
-        window.speechSynthesis.resume();
-        window.speechSynthesis.speak(utterance);
-      } else {
-        // PERBAIKAN SMART TV: Gunakan Audio Streaming Google TTS / Fallback Audio
-        speakTextFallbackAudio(text, onEndCallback);
-      }
-    }
-
-    /* FALLBACK UNTUK SMART TV YANG TIDAK MEMILIKI NATIVE TTS VOICE */
-    function speakTextFallbackAudio(text, onEndCallback) {
-      const ttsAudio = document.getElementById('ttsAudioPlayer');
-      if (!ttsAudio) {
-        if (typeof onEndCallback === 'function') onEndCallback();
-        return;
-      }
-
-      const encodedText = encodeURIComponent(text);
-      const googleTtsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=id&client=tw-ob`;
-
-      ttsAudio.src = googleTtsUrl;
-      ttsAudio.muted = false;
-
-      let hasEnded = false;
-      const finishHandler = () => {
-        if (!hasEnded) {
-          hasEnded = true;
+      let hasFinished = false;
+      const safeCallback = () => {
+        if (!hasFinished) {
+          hasFinished = true;
           if (typeof onEndCallback === 'function') onEndCallback();
         }
       };
 
-      ttsAudio.onended = finishHandler;
-      ttsAudio.onerror = () => {
-        // Jika API diblokir CORS/Jaringan TV, beri estimasi waktu tayang teks
-        const estimatedTime = Math.max(3000, text.length * 90);
-        setTimeout(finishHandler, estimatedTime);
-      };
-
-      ttsAudio.play().catch(() => {
-        const estimatedTime = Math.max(3000, text.length * 90);
-        setTimeout(finishHandler, estimatedTime);
-      });
-    }
-
-    function manualNavigate(target) {
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      const ttsAudio = document.getElementById('ttsAudioPlayer');
-      if (ttsAudio) { ttsAudio.pause(); ttsAudio.currentTime = 0; }
-
-      if (quoteTimeoutFallback) clearTimeout(quoteTimeoutFallback);
-      if (gameTimerInterval) clearInterval(gameTimerInterval);
-      stopIslamicQuotesRotation();
-
-      const normalPlayer = document.getElementById('normalVideoPlayer');
-      const fullPlayer = document.getElementById('fullVideoPlayer');
-      normalPlayer.pause();
-      fullPlayer.pause();
-
-      if (target === 'main') playNormalVideoSequence();
-      else if (target === 'quote') showQuotesSequence();
-      else if (target === 'game') showBrainTeaserGame();
-      else if (target === 'fullvideo') { currentFullVideoIdx = 0; showFullVideoStage(); }
-      else if (target === 'fullimage') showFullImageStage();
-      else if (target === 'griddapur') showDapurGridStage();
-      else if (target === 'griddistribusi') showDistribusiGridStage();
+      if (window.responsiveVoice) {
+        // Menggunakan ResponsiveVoice Bahasa Indonesia
+        window.responsiveVoice.speak(text, "Indonesian Female", {
+          pitch: 1,
+          rate: 0.9,
+          volume: 1,
+          onend: safeCallback,
+          onerror: () => {
+            // Jika koneksi internet terputus di TV, atur timer manual
+            setTimeout(safeCallback, Math.max(3000, text.length * 100));
+          }
+        });
+      } else {
+        setTimeout(safeCallback, Math.max(3000, text.length * 100));
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       renderSideScreens();
       setupImageSlideshow('screen1', IMAGE_DISPLAY_TIME);
       setupImageSlideshow('screen3', IMAGE_DISPLAY_TIME);
-
-      // Pre-load voices jika didukung browser
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = () => {
-          window.speechSynthesis.getVoices();
-        };
-      }
 
       const normalPlayer = document.getElementById('normalVideoPlayer');
       const fullPlayer = document.getElementById('fullVideoPlayer');
@@ -1032,7 +907,10 @@
       normalPlayer.muted = false;
       fullPlayer.muted = false;
 
-      if ('speechSynthesis' in window) window.speechSynthesis.resume();
+      // Inisialisasi Audio Engine Smart TV
+      if (window.responsiveVoice) {
+        window.responsiveVoice.init();
+      }
 
       if (!normalPlayer.paused) normalPlayer.play().catch(e => console.log(e));
       if (!fullPlayer.paused) fullPlayer.play().catch(e => console.log(e));
@@ -1153,7 +1031,7 @@
       const playPromise = audioPlayer.play();
       if (playPromise !== undefined) {
         playPromise.catch(err => {
-          if (err.name === 'NotAllowedError') handleFallback("⚠️ Blokir Autoplay Browser! Silakan klik layar.");
+          if (err.name === 'NotAllowedError') handleFallback("⚠️ Klik tombol aktifkan suara terlebih dahulu!");
           else handleFallback(`⚠️ Gagal memutar '${primarySrc}' (${err.message})`);
         });
       }
@@ -1170,7 +1048,7 @@
       const soundOverlay = document.getElementById('sound-overlay');
       if (soundOverlay) soundOverlay.style.display = 'none';
 
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (window.responsiveVoice) window.responsiveVoice.cancel();
       document.getElementById('normalVideoPlayer').pause();
       document.getElementById('fullVideoPlayer').pause();
       
@@ -1211,27 +1089,42 @@
       playNormalVideoSequence();
     }
 
-    /* MENGUCAPKAN ISI KATA TEKS */
+    /* MENGUCAPKAN ISI KATA TEKS DENGAN RESPONSIVE VOICE (DURASI 30 DETIK) */
     function speakMotivationWithDelay(text, callbackAfterFinish) {
       if (isAdzanPlaying) return;
       if (quoteTimeoutFallback) clearTimeout(quoteTimeoutFallback);
 
       let hasTriggered = false;
-      const onSpeechEnd = () => {
+      const targetDurationMs = 30000; // Durasi tetap 30 detik untuk tampilan kata-kata
+      const startTime = Date.now();
+
+      const proceedToNext = () => {
         if (hasTriggered || isAdzanPlaying) return;
         hasTriggered = true;
+
         if (quoteTimeoutFallback) clearTimeout(quoteTimeoutFallback);
-        
+
+        // Hitung sisa waktu agar total jeda genap 30 detik
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, targetDurationMs - elapsedTime);
+
         setTimeout(() => {
-          if (!isAdzanPlaying && typeof callbackAfterFinish === 'function') callbackAfterFinish();
-        }, 2500); 
+          if (!isAdzanPlaying && typeof callbackAfterFinish === 'function') {
+            callbackAfterFinish();
+          }
+        }, remainingTime);
       };
 
-      speakTextDirect(text, onSpeechEnd);
-      
-      const estimatedDuration = (text.length * 100) + 5000;
-      quoteTimeoutFallback = setTimeout(onSpeechEnd, estimatedDuration);
+      // Mulai pembacaan suara
+      speakTextDirect(text, () => {
+        // Callback dipanggil setelah audio selesai berbicara
+        proceedToNext();
+      });
+
+      // Timer cadangan apabila sistem suara TV menunda/gagal memanggil callback
+      quoteTimeoutFallback = setTimeout(proceedToNext, targetDurationMs);
     }
+    
 
     function showQuotesSequence() {
       if (isAdzanPlaying) return;
