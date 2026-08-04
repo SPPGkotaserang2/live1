@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPPG KOTA SERANG 2 - Multi-Media Display Dynamic</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #08f7ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      color: #fff;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* 📌 TOP HEADER TRANSPARAN & EKSTRA RINGKAS */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      background: transparent;
+      pointer-events: auto;
+    }
+
+    .top-bar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      justify-content: center;
+      background: rgba(0, 15, 20, 0.65);
+      padding: 3px 6px;
+      border-radius: 5px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+    }
+
+    /* 📌 LOGO DI UJUNG KANAN ATAS (GAYA TRANSPARAN SEPERTI WATERMARK TV / SCTV) */
+    .top-logo-right {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      z-index: 1000000;
+      display: flex;
+      align-items: center;
+      background: transparent;
+      padding: 0;
+      border: none;
+      pointer-events: auto;
+    }
+
+    .top-logo-right img {
+      height: 200px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+      opacity: 0.75;
+      filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.7));
+      transition: opacity 0.3s ease;
+      
+      /* TAMBAHKAN BARIS INI */
+      margin-top: -70px; /* Ubah angka plus (+) untuk geser ke BAWAH, atau minus (-) untuk geser ke ATAS (contoh: -10px) */
+    }
+    
+
+    .top-logo-right img:hover {
+      opacity: 1; /* Kembali jelas saat disorot kursor */
+    }
+
+    .time-date-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      color: #00f5d4;
+      font-size: 0.62rem;
+    }
+
+    .time-date-row #clockText {
+      color: #fff;
+      background: rgba(0, 245, 212, 0.25);
+      padding: 0px 3px;
+      border-radius: 3px;
+      border: 1px solid #00f5d4;
+      font-family: monospace;
+      font-size: 0.65rem;
+    }
+
+    /* DAFTAR WAKTU SHOLAT (EKSTRA RINGKAS) */
+    .sholat-row {
+      display: flex;
+      gap: 2px;
+      flex-wrap: nowrap;
+    }
+
+    .sholat-item {
+      display: flex;
+      gap: 2px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1px 3px;
+      border-radius: 3px;
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      font-size: 0.58rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .sholat-item:hover {
+      background: rgba(212, 175, 55, 0.4);
+      transform: scale(1.05);
+      border-color: #00f5d4;
+    }
+
+    .sholat-item .name { color: #ffd700; font-weight: 700; }
+    .sholat-item .time { color: #fff; font-weight: 800; }
+
+    /* LAYAR UTAMA */
+    .screen-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      background: linear-gradient(135deg, #2600ff, #05ffff, hwb(199 3% 0%));
+    }
+
+    .screen-container.hidden-screen {
+      display: none !important;
+    }
+
+    .screen {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background-color: rgba(0, 0, 0, 0.35);
+      border-right: 2px solid rgba(0, 245, 212, 0.2);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+    }
+
+    .screen:last-child {
+      border-right: none;
+    }
+
+    .media-element {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 0;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 245, 212, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+    }
+
+    .media-element.active {
+      opacity: 1;
+      animation: lightningZoomIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .media-element.exit-left {
+      animation: slideExitLeft 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    }
+
+    .media-element.exit-right {
+      animation: slideExitRight 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    }
+
+    .media-element.exit-center {
+      animation: shrinkExitCenter 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    }
+
+    @keyframes slideExitLeft {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-180%, -50%) scale(0.8) rotate(-10deg); opacity: 0; }
+    }
+
+    @keyframes slideExitRight {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(80%, -50%) scale(0.8) rotate(10deg); opacity: 0; }
+    }
+
+    @keyframes shrinkExitCenter {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
+    }
+
+    @keyframes lightningZoomIn {
+      0% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; filter: brightness(3); }
+      30% { filter: brightness(2) drop-shadow(0 0 40px #00f5d4); }
+      60% { transform: translate(-50%, -50%) scale(0.95); filter: brightness(1.3); }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: brightness(1); }
+    }
+
+    #sound-overlay {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #005f73;
+      border: 2px solid #e0fbfc;
+      border-radius: 25px;
+      padding: 10px 24px;
+      z-index: 100001;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    #sound-overlay span {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #e0fbfc;
+    }
+
+    /* OVERLAY STAGES FULLSCREEN */
+    .fullscreen-stage-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      background-color: #001f28; 
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+      z-index: 99990;
+    }
+
+    .fullscreen-stage-overlay.show {
+      display: flex !important;
+      opacity: 1 !important;
+    }
+
+    /* SHOLAT STAGE CARD */
+    .sholat-card {
+      background: rgba(0, 25, 30, 0.85);
+      border: 3px solid #d4af37;
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+      border-radius: 25px;
+      padding: 40px 50px;
+      max-width: 900px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .sholat-header-title { color: #00f5d4; font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
+    .sholat-sub-title { color: #ffd700; font-size: 1.8rem; font-weight: 800; margin-bottom: 25px; }
+    .sholat-quote-body { font-size: 1.5rem; line-height: 1.6; color: #ffffff; font-weight: 600; margin-bottom: 20px; min-height: 110px; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
+    .sholat-footer-tag { display: inline-block; background: rgba(212, 175, 55, 0.2); border: 1px solid #d4af37; color: #ffd700; padding: 8px 24px; border-radius: 20px; font-size: 1.1rem; font-weight: 700; }
+
+    /* QUOTE / MOTIVASI STAGE */
+    #fullscreen-quote-screen { text-align: center; padding: 40px; }
+    #fullscreen-quote-screen.theme-motivation::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(15, 76, 92, 0.92) 0%, rgba(0, 31, 40, 0.98) 100%); z-index: 1; }
+    #fullscreen-quote-screen.theme-motivation .quote-box { background: rgba(10, 35, 45, 0.90); border: 3px solid #00f5d4; }
+    #fullscreen-quote-screen.theme-quran::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(2, 43, 38, 0.95) 0%, rgba(0, 15, 20, 0.98) 100%); z-index: 1; }
+    #fullscreen-quote-screen.theme-quran .quote-box { background: rgba(0, 25, 30, 0.88); border: 3px solid #d4af37; }
+    
+    .quote-content-wrapper { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; max-width: 90%; }
+    .quote-box { padding: 30px 45px; border-radius: 25px; max-width: 1150px; width: 100%; }
+    .quote-category { font-size: 1.1rem; font-weight: 800; letter-spacing: 3px; margin-bottom: 15px; padding: 6px 20px; border-radius: 15px; display: inline-block; background: rgba(255,255,255,0.1); }
+    .quote-text { font-size: 1.9rem; font-weight: 700; color: #ffffff; margin-bottom: 18px; line-height: 1.5; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+    .quote-reference { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; }
+    .quote-date { font-size: 1rem; font-weight: 600; color: #e0fbfc; background: rgba(0, 95, 115, 0.8); padding: 6px 20px; border-radius: 20px; display: inline-block; }
+
+    /* GAME & QUIZ STAGE */
+    .game-box { position: relative; z-index: 2; background: rgba(20, 15, 45, 0.9); padding: 30px 45px; border-radius: 25px; border: 3px solid #ff9e00; max-width: 1100px; width: 90%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .game-badge { background: #ff9e00; color: #10051d; font-weight: 900; font-size: 1.1rem; padding: 6px 24px; border-radius: 20px; margin-bottom: 12px; }
+    .game-subject { color: #00f5d4; font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
+    .game-question { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-bottom: 25px; min-height: 90px; display: flex; align-items: center; justify-content: center; }
+    
+    .timer-display { background: rgba(255, 0, 0, 0.2); border: 2px solid #ff4d4d; color: #ff4d4d; font-weight: 800; font-size: 1rem; padding: 4px 16px; border-radius: 15px; margin-bottom: 15px; }
+
+    .game-options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-bottom: 20px; }
+    .game-option-card { background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 14px 18px; font-size: 1.1rem; font-weight: 700; color: #e0fbfc; display: flex; align-items: center; gap: 15px; text-align: left; transition: all 0.3s ease; }
+    .game-option-card.correct-answer { background: rgba(0, 245, 212, 0.3) !important; border-color: #00f5d4 !important; color: #00f5d4 !important; box-shadow: 0 0 15px rgba(0,245,212,0.5); }
+    .option-prefix { background: rgba(255, 255, 255, 0.15); color: #ff9e00; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0; }
+
+    /* VIDEO FULLSCREEN STAGE */
+    #fullscreen-video-overlay { z-index: 99992; background: #000 !important; }
+    #fullscreen-video-overlay video { width: 100vw; height: 100vh; object-fit: fill; position: relative; z-index: 2; }
+
+    /* IMAGE FULLSCREEN STAGE */
+    #fullscreen-image-overlay { z-index: 99993; }
+    #fullscreen-image-overlay::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 31, 40, 0.90); z-index: 1; }
+    #fullscreen-image-overlay img { width: 90vw; height: 90vh; object-fit: contain; position: relative; z-index: 2; border-radius: 16px; box-shadow: 0 0 40px rgba(0, 245, 212, 0.4); }
+
+    /* PHOTO GRID STAGE */
+    #fullscreen-grid-overlay { z-index: 99994; padding: 20px; justify-content: flex-start; }
+    #fullscreen-grid-overlay::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 31, 40, 0.92); z-index: 1; }
+    .grid-header-title { position: relative; z-index: 2; font-size: 2rem; font-weight: 900; color: #e0fbfc; margin-bottom: 15px; text-align: center; }
+    .photo-grid-container { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); gap: 12px; width: 95vw; height: 80vh; }
+    .photo-card { background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(224, 251, 252, 0.3); border-radius: 10px; overflow: hidden; }
+    .photo-card img { width: 100%; height: 100%; object-fit: cover; }
+  </style>
+</head>
+<body onclick="globalUserGestureActivation()">
+
+  <!-- 🔊 AUDIO PLAYER -->
+  <audio id="adzanAudio" preload="auto"></audio>
+  <audio id="sholawatAudio" src="sholawat.mp3" preload="auto"></audio>
+
+
+  <!-- 📌 HEADER TRANSPARAN MINI & RINGKAS (KOTA SERANG BANTEN) -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="time-date-row">
+        <span id="dayDateText">Loading...</span>
+        <span id="clockText">00:00:00 WIB</span>
+      </div>
+      <div class="sholat-row">
+        <div class="sholat-item" onclick="handleSholatClick('Subuh')" ondblclick="handleSholatDblClick('Subuh')"><span class="name">Sbh:</span><span class="time" id="sholat-subuh">04:47</span></div>
+        <div class="sholat-item" onclick="handleSholatClick('Dzuhur')" ondblclick="handleSholatDblClick('Dzuhur')"><span class="name">Dzh:</span><span class="time" id="sholat-dzuhur">12:04</span></div>
+        <div class="sholat-item" onclick="handleSholatClick('Ashar')" ondblclick="handleSholatDblClick('Ashar')"><span class="name">Ash:</span><span class="time" id="sholat-ashar">15:25</span></div>
+        <div class="sholat-item" onclick="handleSholatClick('Maghrib')" ondblclick="handleSholatDblClick('Maghrib')"><span class="name">Mgh:</span><span class="time" id="sholat-maghrib">17:59</span></div>
+        <div class="sholat-item" onclick="handleSholatClick('Isya')" ondblclick="handleSholatDblClick('Isya')"><span class="name">Isy:</span><span class="time" id="sholat-isya">19:11</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📌 LOGO WATERMARK TRANSPARAN DI UJUNG KANAN ATAS (GAYA SCTV) -->
+  <div class="top-logo-right">
+    <img src="LOGO1.png" alt="Logo SPPG" onerror="this.style.display='none'">
+  </div>
+
+  <div id="sound-overlay" onclick="enableAudio(event)">
+    <span>🔊 KLIK / TEKAN OK UNTUK AKTIFKAN SUARA MULTIMEDIA & VOICE</span>
+  </div>
+
+  <!-- CONTAINER UTAMA (3 SCREEN DISPLAY) -->
+  <div class="screen-container" id="mainContainer">
+    <div class="screen" id="screen1"></div>
+    <div class="screen" id="screen2">
+      <video id="normalVideoPlayer" class="media-element active" playsinline muted></video>
+    </div>
+    <div class="screen" id="screen3"></div>
+  </div>
+
+  <!-- STAGES OVERLAY -->
+  <div id="fullscreen-sholat-stage" class="fullscreen-stage-overlay">
+    <div class="sholat-card">
+      <h1 class="sholat-header-title" id="sholatStageHeader">SAATNYA SHOLAT</h1>
+      <h2 class="sholat-sub-title" id="sholatStageSub">WAKTU SHOLAT</h2>
+      <p class="sholat-quote-body" id="sholatStageMessage">Memuat...</p>
+      <div class="sholat-footer-tag" id="sholatStageFooter">🕌 Mari Mulai Berjamaah</div>
+    </div>
+  </div>
+
+  <div id="fullscreen-quote-screen" class="fullscreen-stage-overlay theme-motivation">
+    <div class="quote-content-wrapper">
+      <div class="quote-box">
+        <div class="quote-category" id="quoteCategory">MOTIVASI HARI INI</div>
+        <h2 class="quote-text" id="dailyQuote">"Sedang memuat..."</h2>
+        <div class="quote-reference" id="quoteRef">- Kata Motivasi -</div>
+        <p class="quote-date" id="currentDate"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="fullscreen-game-screen" class="fullscreen-stage-overlay">
+    <div class="game-box">
+      <div class="game-badge" id="gameBadgeTitle">SPPG KOTA SERANG SERANG SERANG 2</div>
+      <div class="game-subject" id="gameSubject">PELAJARAN</div>
+      <div class="timer-display" id="timerDisplay">Waktu Berpikir: 30 Detik</div>
+      <div class="game-question" id="gameQuestion">Memuat Pertanyaan...</div>
+      <div class="game-options-grid" id="gameOptions"></div>
+    </div>
+  </div>
+
+  <div id="fullscreen-video-overlay" class="fullscreen-stage-overlay">
+    <video id="fullVideoPlayer" playsinline muted></video>
+  </div>
+
+  <div id="fullscreen-image-overlay" class="fullscreen-stage-overlay">
+    <img id="fullImagePlayer" src="STR1.jpg" alt="Gambar Fullscreen" onerror="this.src='gb1.jpeg'">
+  </div>
+
+  <div id="fullscreen-grid-overlay" class="fullscreen-stage-overlay">
+    <h1 class="grid-header-title" id="gridHeaderTitle">DOKUMENTASI DOKUMEN</h1>
+    <div class="photo-grid-container" id="gridContainer"></div>
+  </div>
+
+  <script>
+    const IMAGE_DISPLAY_TIME = 5000;       
+    const FULL_IMAGE_DISPLAY_TIME = 5000;  
+    const GRID_DISPLAY_TIME = 10000;       
+    const SECTION_DURATION_MS = 30000;     
+
+    let isAudioEnabled = false;
+    let isAdzanPlaying = false;
+    let textRotationInterval = null;
+    let clickTimeout = null;
+    let activeQuizTimer = null;
+
+    let currentNormalVideoIdx = 0;
+    let currentFullVideoIdx = 0;
+
+    let sidePhotosList = ['gb1.jpeg', 'gb2.jpg'];
+    let normalVideosList = ['v1.mp4', 'v2.mp4', 'v3.mp4'];
+    let fullVideosList = ['videofull1.mp4', 'videofull2.mp4', 'videofull3.mp4', 'videofull4.mp4', 'videofull5.mp4', 'videofull6.mp4'];
+    
+    // Video khusus yang akan diputar jam 6 pagi (bisa diubah nama filenya)
+    let morningVideoFile = 'Indonesia.mp4'; 
+
+    let dapurPhotosList = ['dpr1.jpeg', 'dpr2.jpeg', 'dpr3.jpeg', 'dpr4.jpeg', 'dpr5.jpeg', 'dpr6.jpeg', 'dpr7.jpeg', 'dpr8.jpeg', 'dpr9.jpeg', 'dpr10.jpeg', 'dpr11.jpeg', 'dpr12.jpeg', 'dpr13.jpeg', 'dpr14.jpeg', 'dpr15.jpeg', 'dpr16.jpeg', 'dpr17.jpeg', 'dpr18.jpeg', 'dpr19.jpeg', 'dpr20.jpeg'];
+    let distribusiPhotosList = ['1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg', '13.jpeg', '14.jpeg', '15.jpeg', '16.jpeg', '17.jpeg', '18.jpeg', '19.jpeg', '20.jpeg'];
+
+    const adzanAudioMap = { 'Subuh': 'adzan_subuh.mp3', 'Dzuhur': 'adzan.mp3', 'Ashar': 'adzan.mp3', 'Maghrib': 'adzan.mp3', 'Isya': 'adzan.mp3' };
+
+    const adzanQuotes = [
+      "“Tinggalkan sejenak urusan dunia. Segeralah mengambil air wudhu dan penuhilah panggilan Allah SWT.”",
+      "“Sholat adalah tiang agama. Barangsiapa menegakkannya, maka ia telah menegakkan agamanya.”",
+      "“Keberkahan harimu dimulai dari seberapa cepat engkau merespons panggilan Adzan.”",
+      "“Sholat tepat waktu adalah amalan yang paling dicintai oleh Allah SWT.”"
+    ];
+
+    const sholawatQuotes = [
+      "“Barangsiapa bersholawat kepadaku satu kali, niscaya Allah bersholawat kepadanya sepuluh kali.” (HR. Muslim)",
+      "“Perbanyaklah sholawat, karena sholawat adalah pembersih dosa dan penenang jiwa.”",
+      "“Basahi bibir dan hatimu dengan puji-pujian kepada Rasulullah SAW setiap saat.”"
+    ];
+
+    /* ==========================================================
+       1. BANK DATA KATA-KATA MOTIVASI TAK TERHINGGA
+       ========================================================== */
+    const motivationalBank = [
+      { text: "Setiap langkah kecil adalah fondasi menuju masa depan yang gemilang.", ref: "Kata Motivasi" },
+      { text: "Kesuksesan bukanlah milik orang yang pintar, tetapi milik mereka yang tak pernah menyerah.", ref: "Inspirasi Harian" },
+      { text: "Jangan batasi tantanganmu, tantanglah batasmu. Hari ini harus lebih baik dari kemarin.", ref: "Semangat Juang" },
+      { text: "Konsistensi adalah kunci utama dari pencapaian besar yang tertunda.", ref: "Kata Motivasi" },
+      { text: "Kegagalan adalah sukses yang tertunda, bangkitlah dan buktikan kemampuanmu.", ref: "Motivasi Hidup" },
+      { text: "Waktu terbaik untuk memulai adalah sekarang. Jangan menunda apa yang bisa dikerjakan hari ini.", ref: "Prinsip Sukses" },
+      { text: "Ubah lelahmu menjadi lillah, maka setiap keringat bernilai ibadah dan berkah.", ref: "Motivasi Islami" },
+      { text: "Orang hebat tidak lahir dari kemudahan, melainkan dari tempaan badai kesulitan.", ref: "Kata Bijak" },
+      { text: "Senyuman dan kerja keras adalah modal terbaik untuk menghadapi dunia hari ini.", ref: "Energi Positif" },
+      { text: "Keyakinan adalah awal mula dari segala hal besar yang akan terwujud.", ref: "Inspirasi Pagi" }
+    ];
+
+    /* ==========================================================
+       2. BANK DATA AL-QUR'AN (TERJEMAHAN ARTI SAJA DARI 30 JUZ)
+       ========================================================== */
+    const quranTranslationBank = [
+      { text: "Maka sesungguhnya bersama kesulitan ada kemudahan.", ref: "QS. Ash-Sharh: 5 (Juz 30)" },
+      { text: "Dan sesungguhnya telah Kami mudahkan Al-Quran untuk pelajaran, maka adakah orang yang mengambil pelajaran?", ref: "QS. Al-Qamar: 17 (Juz 27)" },
+      { text: "Dan Dialah yang menciptakan malam dan siang, matahari dan bulan. Masing-masing beredar pada garis edarnya.", ref: "QS. Al-Anbiya: 33 (Juz 17)" },
+      { text: "Dan bertawakkallah kepada Allah Yang Hidup (Kekal) yang tidak mati, dan bertasbihlah dengan memuji-Nya.", ref: "QS. Al-Furqan: 58 (Juz 19)" },
+      { text: "Hai orang-orang yang beriman, bertakwalah kepada Allah dan hendaklah setiap diri memperhatikan apa yang telah diperbuatnya untuk hari esok.", ref: "QS. Al-Hasyr: 18 (Juz 28)" },
+      { text: "Dan bersabarlah kamu, karena sesungguhnya Allah tidak menyia-nyiakan pahala orang-orang yang berbuat kebaikan.", ref: "QS. Hud: 115 (Juz 12)" },
+      { text: "Dan mintalah pertolongan (kepada Allah) dengan sabar dan sholat.", ref: "QS. Al-Baqarah: 45 (Juz 1)" },
+      { text: "Ingatlah hanya kepada Allah-lah hati menjadi tenteram.", ref: "QS. Ar-Ra'd: 28 (Juz 13)" },
+      { text: "Wahai Tuhan kami, berikanlah kepada kami kebaikan di dunia dan kebaikan di akhirat, dan peliharalah kami dari siksa neraka.", ref: "QS. Al-Baqarah: 201 (Juz 2)" },
+      { text: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.", ref: "QS. Al-Baqarah: 286 (Juz 3)" },
+      { text: "Dan rendahkanlah dirimu terhadap keduanya dengan penuh kasih sayang.", ref: "QS. Al-Isra: 24 (Juz 15)" },
+      { text: "Dan katakanlah: Ya Tuhanku, tambahkanlah ilmu kepadaku.", ref: "QS. Taha: 114 (Juz 16)" },
+      { text: "Maka ingatlah kepada-Ku, niscaya Aku ingat pula kepadamu.", ref: "QS. Al-Baqarah: 152 (Juz 2)" },
+      { text: "Dan barangsiapa bertakwa kepada Allah, niscaya Dia memperbuat baginya jalan keluar.", ref: "QS. At-Talaq: 2 (Juz 28)" },
+      { text: "Sesungguhnya rahmat Allah sangat dekat kepada orang-orang yang berbuat kebaikan.", ref: "QS. Al-A'raf: 56 (Juz 8)" }
+    ];
+
+    /* ==========================================================
+       3. BANK DATA EDUKASI / SOAL SAINS & UMUM
+       ========================================================== */
+    const educationQuizBank = [
+      {
+        subject: "Pelajaran : Sains / Astronomi",
+        question: "Planet manakah yang dikenal sebagai Planet Merah?",
+        options: ["Mars", "Venus", "Yupiter", "Saturnus"],
+        correct: 0
+      },
+      {
+        subject: "Pelajaran : Biologi / Anatomi",
+        question: "Organ tubuh manusia yang berfungsi untuk memompa darah adalah?",
+        options: ["Paru-paru", "Jantung", "Ginjal", "Hati"],
+        correct: 1
+      },
+      {
+        subject: "Pelajaran : Fisika Dasar",
+        question: "Apa unsur kimia utama dari air bersih?",
+        options: ["H2O", "CO2", "O2", "NaCl"],
+        correct: 0
+      },
+      {
+        subject: "Pelajaran : Geografi Nusantara",
+        question: "Ibukota Provinsi Banten berada di kota mana?",
+        options: ["Serang", "Tangerang", "Cilegon", "Rangkasbitung"],
+        correct: 0
+      },
+      {
+        subject: "Pelajaran : Sains / Alam",
+        question: "Tumbuhan melakukan proses pembuatan makanan sendiri yang disebut dengan?",
+        options: ["Respirasi", "Fotosintesis", "Transpirasi", "Erosi"],
+        correct: 1
+      },
+      {
+        subject: "Pelajaran : Sejarah & Pengetahuan",
+        question: "Benua terbesar di permukaan bumi adalah benua apa?",
+        options: ["Afrika", "Amerika", "Asia", "Eropa"],
+        correct: 2
+      },
+      {
+        subject: "Pelajaran : Kimia & Lingkungan",
+        question: "Gas yang dihirup oleh manusia untuk pernapasan sehari-hari adalah?",
+        options: ["Karbon Dioksida", "Oksigen", "Nitrogen", "Hidrogen"],
+        correct: 1
+      }
+    ];
+
+    /* ==========================================================
+       4. BANK DATA TEBAK-TEBAKAN / KUIS SERU
+       ========================================================== */
+    const tebakTebakanBank = [
+      {
+        subject: "Tebak-Tebakan : Asah Otak",
+        question: "Gajah apa yang belalainya pendek?",
+        options: ["Gajah bengkak", "Gajah cilik (kecil)", "Gajah sumatera", "Gajah afrika"],
+        correct: 1
+      },
+      {
+        subject: "Tebak-Tebakan : Lucu & Kreatif",
+        question: "Hewan apa yang paling patuh dan disiplin sama lalu lintas?",
+        options: ["Kuda zebra", "Kucing", "Anjing", "Monyet"],
+        correct: 0
+      },
+      {
+        subject: "Tebak-Tebakan : Jenaka",
+        question: "Kucing apa yang kalau dikejar sering lari masuk kantong?",
+        options: ["Kucing garong", "Kantong kresek", "Kucing anggora", "Kucing persia"],
+        correct: 1
+      },
+      {
+        subject: "Tebak-Tebakan : Teka-Teki Ringan",
+        question: "Kenapa pohon pisang daunnya bisa berbentuk melebar?",
+        options: ["Karena warnanya hijau", "Karena tidak punya payung", "Supaya bisa meneduhi rumput", "Karena niat dari kecil"],
+        correct: 1
+      },
+      {
+        subject: "Tebak-Tebakan : Logika Unik",
+        question: "Benda apa yang kalau dibeli malah bertambah panjang?",
+        options: ["Kain meteran", "Tali rafia", "Kertas rol", "Pita kado"],
+        correct: 0
+      },
+      {
+        subject: "Tebak-Tebakan : Humor Pintar",
+        question: "Lampu apa yang kalau dipecahkan keluar orangnya?",
+        options: ["Lampu neon", "Lampu tetangga", "Lampu belajar", "Lampu merah"],
+        correct: 1
+      }
+    ];
+
+    /* 🕌 FETCH JADWAL SHOLAT SINKRON KOTA SERANG BANTEN */
+    async function fetchPrayerTimesSerang() {
+      try {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+        const date = today.getDate();
+
+        const response = await fetch(`https://api.aladhan.com/v1/timings/${date}-${month}-${year}?latitude=-6.12&longitude=106.15&method=20`);
+        const result = await response.json();
+
+        if (result && result.data && result.data.timings) {
+          const t = result.data.timings;
+          
+          document.getElementById('sholat-subuh').innerText = t.Fajr.substring(0, 5);
+          document.getElementById('sholat-dzuhur').innerText = t.Dhuhr.substring(0, 5);
+          document.getElementById('sholat-ashar').innerText = t.Asr.substring(0, 5);
+          document.getElementById('sholat-maghrib').innerText = t.Maghrib.substring(0, 5);
+          document.getElementById('sholat-isya').innerText = t.Isha.substring(0, 5);
+        }
+      } catch (error) {
+        console.warn("Gagal mengambil data sholat, menggunakan cadangan waktu Kota Serang.", error);
+      }
+    }
+
+    /* REALTIME JAM & AUTOMATIC ADZAN / PEMUTAR VIDEO JAM 6 PAGI */
+    let lastTriggeredMinute = "";
+    let lastMorningVideoTriggerDate = ""; // Mencegah video terputar berkali-kali dalam satu menit yang sama pada jam 6
+
+    function updateClockAndDate() {
+      const now = new Date();
+      const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('dayDateText').innerText = now.toLocaleDateString('id-ID', optionsDate);
+      
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clockText').innerText = `${hours}:${minutes}:${seconds} WIB`;
+
+      const currentTimeHM = `${hours}:${minutes}`;
+      const currentDateStr = now.toDateString();
+
+      // 📌 FITUR BARU: PUTAR VIDEO LOKAL SETIAP JAM 06:00 PAGI[cite: 2]
+      if (currentTimeHM === "06:00" && lastMorningVideoTriggerDate !== currentDateStr) {
+        lastMorningVideoTriggerDate = currentDateStr;
+        triggerMorningVideoSequence();
+      }
+
+      if (currentTimeHM !== lastTriggeredMinute && seconds === "00") {
+        const times = {
+          'Subuh': document.getElementById('sholat-subuh').innerText,
+          'Dzuhur': document.getElementById('sholat-dzuhur').innerText,
+          'Ashar': document.getElementById('sholat-ashar').innerText,
+          'Maghrib': document.getElementById('sholat-maghrib').innerText,
+          'Isya': document.getElementById('sholat-isya').innerText
+        };
+
+        for (let sholatName in times) {
+          if (times[sholatName] === currentTimeHM) {
+            lastTriggeredMinute = currentTimeHM;
+            triggerAdzanSequence(sholatName);
+            break;
+          }
+        }
+      }
+    }
+    setInterval(updateClockAndDate, 1000);
+
+    /* 🎬 FUNGSI UNTUK MENJALANKAN VIDEO KHUSUS JAM 6 PAGI */
+    function triggerMorningVideoSequence() {
+      if (isAdzanPlaying) return;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
+
+      // Hentikan pemutaran normal atau kuis lain
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      if (normalPlayer) normalPlayer.pause();
+
+      const videoOverlay = document.getElementById('fullscreen-video-overlay');
+      const fullPlayer = document.getElementById('fullVideoPlayer');
+
+      fullPlayer.src = morningVideoFile;
+      fullPlayer.muted = !isAudioEnabled;
+
+      showStage(videoOverlay);
+
+      fullPlayer.play().catch(() => {
+        // Jika gagal autoplay, fallback kembali ke pemutaran normal
+        restoreMainContainer();
+        playNormalVideoSequence();
+      });
+    }
+
+    /* 🖼️ LAYAR 1 & 3: GAMBAR KIRI/KANAN */
+    function renderSideScreens() {
+      const s1 = document.getElementById('screen1');
+      const s3 = document.getElementById('screen3');
+      s1.innerHTML = ''; s3.innerHTML = '';
+
+      sidePhotosList.forEach((filename, idx) => {
+        const activeClass = idx === 0 ? 'active' : '';
+        s1.innerHTML += `<img src="${filename}" class="media-element ${activeClass}" onerror="this.style.display='none'">`;
+        s3.innerHTML += `<img src="${filename}" class="media-element ${activeClass}" onerror="this.style.display='none'">`;
+      });
+    }
+
+    function setupImageSlideshow(screenId, intervalMs) {
+      const screen = document.getElementById(screenId);
+      let currentIndex = 0;
+
+      return setInterval(() => {
+        const validImages = Array.from(screen.querySelectorAll('img')).filter(img => img.style.display !== 'none');
+        if (validImages.length <= 1) return;
+
+        const currentImg = validImages[currentIndex];
+        const exitEffects = ['exit-left', 'exit-right', 'exit-center'];
+        const chosenExit = exitEffects[Math.floor(Math.random() * exitEffects.length)];
+
+        currentImg.classList.remove('active');
+        currentImg.classList.add(chosenExit);
+
+        setTimeout(() => { currentImg.classList.remove(chosenExit); }, 800);
+
+        currentIndex = (currentIndex + 1) % validImages.length;
+        const nextImg = validImages[currentIndex];
+        nextImg.classList.add('active');
+      }, intervalMs);
+    }
+
+    /* KLIK SHOLAT HANDLER */
+    function handleSholatClick(namaSholat) {
+      if (clickTimeout !== null) clearTimeout(clickTimeout);
+      clickTimeout = setTimeout(() => { triggerAdzanSequence(namaSholat); }, 250);
+    }
+
+    function handleSholatDblClick(namaSholat) {
+      if (clickTimeout !== null) { clearTimeout(clickTimeout); clickTimeout = null; }
+      playSholawatDirectly();
+    }
+
+    /* ROTASI TEKS */
+    function startTextRotation(quotesArray) {
+      stopTextRotation();
+      let index = 0;
+      const msgElement = document.getElementById('sholatStageMessage');
+      msgElement.innerText = quotesArray[0];
+
+      textRotationInterval = setInterval(() => {
+        index = (index + 1) % quotesArray.length;
+        msgElement.style.opacity = 0;
+        setTimeout(() => {
+          msgElement.innerText = quotesArray[index];
+          msgElement.style.opacity = 1;
+        }, 300);
+      }, 5000);
+    }
+
+    function stopTextRotation() {
+      if (textRotationInterval) { clearInterval(textRotationInterval); textRotationInterval = null; }
+    }
+
+    /* ADZAN & SHOLAWAT SEQUENCES */
+    function triggerAdzanSequence(namaSholat) {
+      if (!isAudioEnabled) enableAudio();
+      isAdzanPlaying = true;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      const sholawatAudio = document.getElementById('sholawatAudio');
+      if (normalPlayer) normalPlayer.pause();
+      if (sholawatAudio) sholawatAudio.pause();
+
+      const stage = document.getElementById('fullscreen-sholat-stage');
+      document.getElementById('sholatStageHeader').innerText = "🕌 SAATNYA SHOLAT 🕌";
+      document.getElementById('sholatStageSub').innerText = `WAKTU SHOLAT ${namaSholat.toUpperCase()}`;
+      document.getElementById('sholatStageFooter').innerText = "🕌 Mari Mulai Berjamaah";
+
+      showStage(stage);
+      startTextRotation(adzanQuotes);
+
+      speakTextDirect(`Memasuki waktu sholat ${namaSholat} untuk Kota Serang dan sekitarnya.`, () => {
+        const adzanAudio = document.getElementById('adzanAudio');
+        const selectedAudio = adzanAudioMap[namaSholat] || 'adzan.mp3';
+
+        if (adzanAudio) {
+          adzanAudio.src = selectedAudio;
+          adzanAudio.currentTime = 0;
+          adzanAudio.play().then(() => {
+            adzanAudio.onended = () => { playSholawatPhase(); };
+          }).catch(() => playSholawatPhase());
+        } else {
+          playSholawatPhase();
+        }
+      });
+    }
+
+    function playSholawatPhase() {
+      const sholawatAudio = document.getElementById('sholawatAudio');
+
+      document.getElementById('sholatStageHeader').innerText = "✨ LANTUNAN SHOLAWAT ✨";
+      document.getElementById('sholatStageSub').innerText = "MEMAJUKAN SUNNAH & SHOLAWAT";
+      document.getElementById('sholatStageFooter').innerText = "💚 Allahumma Sholli 'Ala Sayyidina Muhammad";
+
+      startTextRotation(sholawatQuotes);
+
+      if (sholawatAudio) {
+        sholawatAudio.currentTime = 0;
+        sholawatAudio.play().then(() => {
+          sholawatAudio.onended = () => { finishAdzanSequence(); };
+        }).catch(() => finishAdzanSequence());
+      } else {
+        finishAdzanSequence();
+      }
+    }
+
+    function playSholawatDirectly() {
+      if (!isAudioEnabled) enableAudio();
+      isAdzanPlaying = true;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      const adzanAudio = document.getElementById('adzanAudio');
+      if (normalPlayer) normalPlayer.pause();
+      if (adzanAudio) adzanAudio.pause();
+
+      const stage = document.getElementById('fullscreen-sholat-stage');
+      document.getElementById('sholatStageHeader').innerText = "✨ LANTUNAN SHOLAWAT ✨";
+      document.getElementById('sholatStageSub').innerText = "MEMAJUKAN SUNNAH & SHOLAWAT";
+      document.getElementById('sholatStageFooter').innerText = "💚 Allahumma Sholli 'Ala Sayyidina Muhammad";
+
+      showStage(stage);
+      startTextRotation(sholawatQuotes);
+
+      const sholawatAudio = document.getElementById('sholawatAudio');
+      if (sholawatAudio) {
+        sholawatAudio.currentTime = 0;
+        sholawatAudio.play().then(() => {
+          sholawatAudio.onended = () => { finishAdzanSequence(); };
+        }).catch(() => finishAdzanSequence());
+      } else {
+        finishAdzanSequence();
+      }
+    }
+
+    function finishAdzanSequence() {
+      stopTextRotation();
+      isAdzanPlaying = false;
+      restoreMainContainer();
+      playNormalVideoSequence();
+    }
+
+    /* ALUR MULTIMEDIA */
+    function playNormalVideoSequence() {
+      if (isAdzanPlaying) return;
+      restoreMainContainer();
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      const targetSrc = normalVideosList[currentNormalVideoIdx] || 'v1.mp4';
+
+      normalPlayer.src = targetSrc;
+      normalPlayer.muted = !isAudioEnabled;
+
+      normalPlayer.play().catch(() => {
+        normalPlayer.muted = true;
+        normalPlayer.play().catch(() => onNormalVideoEnded());
+      });
+    }
+
+    function onNormalVideoEnded() {
+      if (isAdzanPlaying) return;
+      currentNormalVideoIdx++;
+      if (currentNormalVideoIdx >= normalVideosList.length) {
+        currentNormalVideoIdx = 0; 
+        showQuotesSequence();    
+      } else {
+        playNormalVideoSequence(); 
+      }
+    }
+
+    /* ==========================================================
+       1. KATA-KATA MOTIVASI (HANYA ISI TEKS SAJA)
+       ========================================================== */
+    function showQuotesSequence() {
+      if (isAdzanPlaying) return;
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      normalPlayer.pause();
+
+      const today = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('currentDate').innerText = today.toLocaleDateString('id-ID', options);
+
+      const randomMotivasi = motivationalBank[Math.floor(Math.random() * motivationalBank.length)];
+
+      const quoteScreen = document.getElementById('fullscreen-quote-screen');
+      showStage(quoteScreen);
+
+      quoteScreen.className = 'fullscreen-stage-overlay show theme-motivation';
+      document.getElementById('quoteCategory').innerText = "MOTIVASI HARI INI";
+      document.getElementById('dailyQuote').innerText = `"${randomMotivasi.text}"`;
+      document.getElementById('quoteRef').innerText = `- ${randomMotivasi.ref} -`;
+
+      speakTextDirect(randomMotivasi.text, () => {});
+
+      setTimeout(() => {
+        if (!isAdzanPlaying) showQuranSequence();
+      }, SECTION_DURATION_MS);
+    }
+
+    /* ==========================================================
+       2. AL-QURAN EDUKASI (HANYA ISI TEKS/TERJEMAHAN SAJA)
+       ========================================================== */
+    function showQuranSequence() {
+      if (isAdzanPlaying) return;
+
+      const randomQuran = quranTranslationBank[Math.floor(Math.random() * quranTranslationBank.length)];
+
+      const quoteScreen = document.getElementById('fullscreen-quote-screen');
+      showStage(quoteScreen);
+
+      quoteScreen.className = 'fullscreen-stage-overlay show theme-quran';
+      document.getElementById('quoteCategory').innerText = "ARTI AYAT AL-QUR'AN (30 JUZ)";
+      document.getElementById('dailyQuote').innerText = `"${randomQuran.text}"`;
+      document.getElementById('quoteRef').innerText = `- ${randomQuran.ref} -`;
+
+      speakTextDirect(`${randomQuran.text}. ${randomQuran.ref}`, () => {});
+
+      setTimeout(() => {
+        if (!isAdzanPlaying) showEducationQuizStage();
+      }, SECTION_DURATION_MS);
+    }
+
+    /* ==========================================================
+       3. EDUKASI / SOAL (HANYA PERTANYAAN DAN PILIHAN SAJA)
+       ========================================================== */
+    function showEducationQuizStage() {
+      if (isAdzanPlaying) return;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
+
+      const randomEdu = educationQuizBank[Math.floor(Math.random() * educationQuizBank.length)];
+
+      const gameScreen = document.getElementById('fullscreen-game-screen');
+      document.getElementById('gameBadgeTitle').innerText = "SPPG KOTA SERANG SERANG SERANG 2";
+      document.getElementById('gameSubject').innerText = randomEdu.subject;
+      document.getElementById('gameQuestion').innerText = randomEdu.question;
+      
+      const timerEl = document.getElementById('timerDisplay');
+      let timeLeft = 30;
+      timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik (Menunggu Jawaban)`;
+
+      const optionsGrid = document.getElementById('gameOptions');
+      const letters = ['A', 'B', 'C', 'D'];
+      optionsGrid.innerHTML = '';
+      
+      randomEdu.options.forEach((opt, idx) => {
+        optionsGrid.innerHTML += `
+          <div class="game-option-card" id="edu-opt-${idx}">
+            <span class="option-prefix">${letters[idx]}</span> 
+            <span>${opt}</span>
+          </div>
+        `;
+      });
+
+      showStage(gameScreen);
+
+      let speechText = `${randomEdu.question}. Pilihan jawaban: `;
+      randomEdu.options.forEach((opt, idx) => { speechText += `Pilihan ${letters[idx]}, ${opt}. `; });
+      
+      speakTextDirect(speechText, () => {});
+
+      let countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik`;
+        } else {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+
+      activeQuizTimer = setTimeout(() => {
+        clearInterval(countdownInterval);
+        timerEl.innerText = `✅ Waktu Habis! Jawaban yang Benar Ditampilkan:`;
+
+        const correctCard = document.getElementById(`edu-opt-${randomEdu.correct}`);
+        if (correctCard) correctCard.classList.add('correct-answer');
+
+        const correctAnsText = randomEdu.options[randomEdu.correct];
+        
+        speakTextDirect(`Jawaban yang benar adalah: ${correctAnsText}`, () => {});
+
+        activeQuizTimer = setTimeout(() => {
+          if (!isAdzanPlaying) showBrainTeaserGame();
+        }, 6000);
+
+      }, 30000);
+    }
+
+    /* ==========================================================
+       4. TEBAK-TEBAKAN (HANYA PERTANYAAN DAN PILIHAN SAJA)
+       ========================================================== */
+    function showBrainTeaserGame() {
+      if (isAdzanPlaying) return;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
+
+      const randomTeaser = tebakTebakanBank[Math.floor(Math.random() * tebakTebakanBank.length)];
+
+      const gameScreen = document.getElementById('fullscreen-game-screen');
+      document.getElementById('gameBadgeTitle').innerText = "SPPG KOTA SERANG SERANG SERANG 2";
+      document.getElementById('gameSubject').innerText = randomTeaser.subject;
+      document.getElementById('gameQuestion').innerText = randomTeaser.question;
+
+      const timerEl = document.getElementById('timerDisplay');
+      let timeLeft = 30;
+      timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik (Menunggu Jawaban)`;
+
+      const optionsGrid = document.getElementById('gameOptions');
+      const letters = ['A', 'B', 'C', 'D'];
+      optionsGrid.innerHTML = '';
+
+      randomTeaser.options.forEach((opt, idx) => {
+        optionsGrid.innerHTML += `
+          <div class="game-option-card" id="teaser-opt-${idx}">
+            <span class="option-prefix">${letters[idx]}</span> 
+            <span>${opt}</span>
+          </div>
+        `;
+      });
+
+      showStage(gameScreen);
+
+      let speechText = `${randomTeaser.question}. Pilihan jawabannya: `;
+      randomTeaser.options.forEach((opt, idx) => { speechText += `Pilihan ${letters[idx]}, ${opt}. `; });
+
+      speakTextDirect(speechText, () => {});
+
+      let countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik`;
+        } else {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+
+      activeQuizTimer = setTimeout(() => {
+        clearInterval(countdownInterval);
+        timerEl.innerText = `✅ Waktu Habis! Jawaban yang Benar Ditampilkan:`;
+
+        const correctCard = document.getElementById(`teaser-opt-${randomTeaser.correct}`);
+        if (correctCard) correctCard.classList.add('correct-answer');
+
+        const correctAnsText = randomTeaser.options[randomTeaser.correct];
+        
+        speakTextDirect(`Jawaban yang benar adalah: ${correctAnsText}`, () => {});
+
+        activeQuizTimer = setTimeout(() => {
+          if (!isAdzanPlaying) {
+            currentFullVideoIdx = 0;
+            showFullVideoStage();
+          }
+        }, 6000);
+
+      }, 30000);
+    }
+
+    function showFullVideoStage() {
+      if (isAdzanPlaying) return;
+
+      if (!fullVideosList || fullVideosList.length === 0 || currentFullVideoIdx >= fullVideosList.length) {
+        currentFullVideoIdx = 0; 
+        showFullImageStage();
+        return;
+      }
+
+      const videoOverlay = document.getElementById('fullscreen-video-overlay');
+      const fullPlayer = document.getElementById('fullVideoPlayer');
+
+      fullPlayer.src = fullVideosList[currentFullVideoIdx];
+      fullPlayer.muted = !isAudioEnabled;
+
+      showStage(videoOverlay);
+
+      fullPlayer.play().catch(() => {
+        handleFullVideoNext(); 
+      });
+    }
+
+    function handleFullVideoNext() {
+      if (isAdzanPlaying) return;
+      currentFullVideoIdx++; 
+      showFullVideoStage();  
+    }
+
+    function showFullImageStage() {
+      if (isAdzanPlaying) return;
+
+      const imageOverlay = document.getElementById('fullscreen-image-overlay');
+      showStage(imageOverlay);
+
+      setTimeout(() => {
+        if (!isAdzanPlaying) showDapurGridStage();
+      }, FULL_IMAGE_DISPLAY_TIME);
+    }
+
+    function renderPhotoGrid(photosArray) {
+      const container = document.getElementById('gridContainer');
+      container.innerHTML = '';
+
+      photosArray.slice(0, 20).forEach(src => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        card.innerHTML = `<img src="${src}" onerror="this.src='gb1.jpeg'">`;
+        container.appendChild(card);
+      });
+    }
+
+    function showDapurGridStage() {
+      if (isAdzanPlaying) return;
+
+      document.getElementById('gridHeaderTitle').innerText = "DOKUMENTASI DAPUR & AKTIVITAS";
+      renderPhotoGrid(dapurPhotosList);
+
+      showStage(document.getElementById('fullscreen-grid-overlay'));
+
+      setTimeout(() => {
+        if (!isAdzanPlaying) showDistribusiGridStage();
+      }, GRID_DISPLAY_TIME);
+    }
+
+    function showDistribusiGridStage() {
+      if (isAdzanPlaying) return;
+
+      document.getElementById('gridHeaderTitle').innerText = "DOKUMENTASI DISTRIBUSI LAPANGAN";
+      renderPhotoGrid(distribusiPhotosList);
+
+      showStage(document.getElementById('fullscreen-grid-overlay'));
+
+      setTimeout(() => {
+        if (!isAdzanPlaying) playNormalVideoSequence();
+      }, GRID_DISPLAY_TIME);
+    }
+
+    /* UTILITY CONTROL */
+    function hideAllStages() {
+      const overlays = document.querySelectorAll('.fullscreen-stage-overlay');
+      overlays.forEach(overlay => {
+        overlay.classList.remove('show');
+        overlay.style.display = 'none';
+      });
+    }
+
+    function showStage(element) {
+      const mainContainer = document.getElementById('mainContainer');
+      if (mainContainer) mainContainer.classList.add('hidden-screen');
+      hideAllStages(); 
+      element.style.display = 'flex';
+      void element.offsetWidth; 
+      element.classList.add('show');
+    }
+
+    function restoreMainContainer() {
+      hideAllStages();
+      const mainContainer = document.getElementById('mainContainer');
+      if (mainContainer) mainContainer.classList.remove('hidden-screen');
+    }
+
+    function globalUserGestureActivation() {
+      if (!isAudioEnabled) enableAudio();
+    }
+
+    function enableAudio(e) {
+      if (e) e.stopPropagation();
+      isAudioEnabled = true;
+
+      const overlay = document.getElementById('sound-overlay');
+      if (overlay) overlay.style.display = 'none';
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      const fullPlayer = document.getElementById('fullVideoPlayer');
+
+      normalPlayer.muted = false;
+      fullPlayer.muted = false;
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const dummyUtter = new SpeechSynthesisUtterance("");
+        window.speechSynthesis.speak(dummyUtter);
+      }
+
+      if (!normalPlayer.paused) normalPlayer.play().catch(() => {});
+      if (!fullPlayer.paused) fullPlayer.play().catch(() => {});
+    }
+
+    /* 🔊 FUNGSI VOICE UTAMA MENGGUNAKAN WEB SPEECH API */
+    function speakTextDirect(text, onEndCallback) {
+      if (!('speechSynthesis' in window)) {
+        if (typeof onEndCallback === 'function') onEndCallback();
+        return;
+      }
+
+      try {
+        window.speechSynthesis.cancel();
+        constutterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'id-ID';
+        utterance.rate = 0.95; 
+        utterance.pitch = 1.0;
+
+        utterance.onend = function() {
+          if (typeof onEndCallback === 'function') onEndCallback();
+        };
+
+        utterance.onerror = function() {
+          if (typeof onEndCallback === 'function') onEndCallback();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        if (typeof onEndCallback === 'function') onEndCallback();
+      }
+    }
+
+    /* INITIALIZATION */
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchPrayerTimesSerang(); 
+      renderSideScreens();
+      setupImageSlideshow('screen1', IMAGE_DISPLAY_TIME);
+      setupImageSlideshow('screen3', IMAGE_DISPLAY_TIME);
+
+      const normalPlayer = document.getElementById('normalVideoPlayer');
+      const fullPlayer = document.getElementById('fullVideoPlayer');
+
+      normalPlayer.addEventListener('ended', onNormalVideoEnded);
+      normalPlayer.addEventListener('error', onNormalVideoEnded);
+
+      fullPlayer.addEventListener('ended', handleFullVideoNext);
+      fullPlayer.addEventListener('error', handleFullVideoNext);
+
+      playNormalVideoSequence();
+    });
+  </script>
+</body>
+</html>
