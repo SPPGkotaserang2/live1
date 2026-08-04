@@ -32,7 +32,7 @@
       top: 0;
       left: 0;
       z-index: 10;
-      background: linear-gradient(135deg, #70c1b3, #87ceeb, #5fa89f);
+      background: linear-gradient(135deg, #0d3b4c, #001f28, #104e5b);
     }
 
     .screen-container.hidden-screen {
@@ -43,36 +43,90 @@
       flex: 1;
       height: 100%;
       position: relative;
-      background-color: rgba(0, 0, 0, 0.25);
-      border-right: 3px solid rgba(255, 255, 255, 0.3);
+      background-color: rgba(0, 0, 0, 0.35);
+      border-right: 2px solid rgba(0, 245, 212, 0.2);
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(8px);
+      perspective: 1000px;
     }
 
     .screen:last-child {
       border-right: none;
     }
 
+    /* 🌟 EFEK TRANSISI GAMBAR DENGAN KILAT PETIR & GESER KELUAR 🌟 */
     .media-element {
-      max-width: 96%;
-      max-height: 96%;
+      max-width: 92%;
+      max-height: 92%;
       object-fit: contain;
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.95);
+      transform: translate(-50%, -50%) scale(1);
       opacity: 0;
-      transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 245, 212, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      pointer-events: none;
     }
 
+    /* POSISI KELUAR 1: GESER KE KIRI */
+    .media-element.exit-left {
+      animation: slideExitLeft 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    }
+
+    /* POSISI KELUAR 2: GESER KE KANAN */
+    .media-element.exit-right {
+      animation: slideExitRight 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    }
+
+    /* POSISI KELUAR 3: MENYUSUT KE TENGAH */
+    .media-element.exit-center {
+      animation: shrinkExitCenter 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    }
+
+    /* POSISI MASUK: ZOOM OUT SEPERTI PETIR (KILAT SANGAT CEPAT & TAJAM) */
     .media-element.active {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      animation: lightningZoomIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes slideExitLeft {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-180%, -50%) scale(0.8) rotate(-10deg); opacity: 0; }
+    }
+
+    @keyframes slideExitRight {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(80%, -50%) scale(0.8) rotate(10deg); opacity: 0; }
+    }
+
+    @keyframes shrinkExitCenter {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
+    }
+
+    @keyframes lightningZoomIn {
+      0% {
+        transform: translate(-50%, -50%) scale(2.8);
+        opacity: 0;
+        filter: brightness(3) drop-shadow(0 0 50px #fff);
+      }
+      30% {
+        filter: brightness(2) drop-shadow(0 0 40px #00f5d4);
+      }
+      60% {
+        transform: translate(-50%, -50%) scale(0.95);
+        filter: brightness(1.3);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        filter: brightness(1);
+      }
     }
 
     #sound-overlay {
@@ -347,7 +401,7 @@
       height: 100%;
       width: 100%;
       background: linear-gradient(90deg, #ff9e00, #00f5d4);
-      transition: width 1s linear;
+      transition: width 30s linear;
     }
 
     #fullscreen-video-overlay {
@@ -379,6 +433,7 @@
       position: relative;
       z-index: 2;
       border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0, 245, 212, 0.4);
     }
 
     #fullscreen-grid-overlay {
@@ -421,160 +476,13 @@
       border: 2px solid rgba(224, 251, 252, 0.3);
       border-radius: 10px;
       overflow: hidden;
+      transition: transform 0.3s ease;
     }
 
     .photo-card img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    #adzan-overlay {
-      z-index: 99999;
-      background: radial-gradient(circle at center, #002b20 0%, #00080c 100%);
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .visual-stage-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      padding: 35px 20px;
-    }
-
-    .adzan-display-info {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-    }
-
-    .adzan-sppg-name {
-      font-size: 2.3rem;
-      font-weight: 900;
-      color: #d4af37;
-      letter-spacing: 4px;
-      margin-bottom: 8px;
-    }
-
-    .adzan-status-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: #00f5d4;
-      background: rgba(0, 31, 40, 0.7);
-      padding: 6px 28px;
-      border-radius: 30px;
-      border: 1px solid rgba(0, 245, 212, 0.4);
-      display: inline-block;
-    }
-
-    .adzan-error-log {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: #ff4d5e;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 4px 14px;
-      border-radius: 8px;
-      display: none;
-    }
-
-    .islamic-quotes-container {
-      position: relative;
-      z-index: 10;
-      width: 88%;
-      max-width: 1200px;
-      background: rgba(0, 20, 25, 0.80);
-      border: 2px solid rgba(212, 175, 55, 0.6);
-      border-radius: 20px;
-      padding: 25px 35px;
-      box-shadow: 0 0 30px rgba(0, 245, 212, 0.15);
-      backdrop-filter: blur(8px);
-      text-align: center;
-      transition: all 0.5s ease-in-out;
-    }
-
-    .quote-headline {
-      font-size: 1.7rem;
-      font-weight: 800;
-      color: #d4af37;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      transition: opacity 0.5s ease;
-    }
-
-    .quote-main-text {
-      font-size: 1.45rem;
-      font-weight: 600;
-      color: #ffffff;
-      line-height: 1.6;
-      min-height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease;
-    }
-
-    .quote-sub-text {
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: #00f5d4;
-      margin-top: 10px;
-      font-style: italic;
-    }
-
-    .gold-glow-ring {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 380px;
-      height: 380px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, rgba(0, 245, 212, 0.08) 60%, transparent 70%);
-      animation: pulseGlow 3s infinite ease-in-out;
-      pointer-events: none;
-    }
-
-    .wave-bars-container {
-      position: relative;
-      z-index: 5;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      height: 50px;
-    }
-
-    .wave-bar {
-      width: 10px;
-      height: 30%;
-      background: linear-gradient(180deg, #00f5d4, #d4af37);
-      border-radius: 10px;
-      animation: waveBeat 1.2s infinite ease-in-out alternate;
-    }
-
-    .wave-bar:nth-child(1) { animation-delay: 0.1s; }
-    .wave-bar:nth-child(2) { animation-delay: 0.3s; }
-    .wave-bar:nth-child(3) { animation-delay: 0.5s; }
-    .wave-bar:nth-child(4) { animation-delay: 0.2s; }
-    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
-    .wave-bar:nth-child(6) { animation-delay: 0.4s; }
-    .wave-bar:nth-child(7) { animation-delay: 0.2s; }
-
-    @keyframes pulseGlow {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
-      50% { transform: translate(-50%, -50%) scale(1.35); opacity: 1; }
-    }
-
-    @keyframes waveBeat {
-      0% { height: 20%; }
-      100% { height: 100%; }
     }
 
     @keyframes bounceOverlay {
@@ -612,7 +520,7 @@
 
   <div id="fullscreen-game-screen" class="fullscreen-stage-overlay">
     <div class="game-box">
-      <div class="game-badge">🧠 ASAH OTAK & EDUKASI</div>
+      <div class="game-badge" id="gameBadge">🧠 ASAH OTAK & EDUKASI</div>
       <div class="game-subject" id="gameSubject">PELAJARAN: SAINS & KNOWLEDGE</div>
       <div class="game-question" id="gameQuestion">Memuat Pertanyaan...</div>
       <div class="game-options-grid" id="gameOptions"></div>
@@ -627,7 +535,7 @@
   </div>
 
   <div id="fullscreen-image-overlay" class="fullscreen-stage-overlay">
-    <img id="fullImagePlayer" src="STR1.jpg" alt="Gambar Fullscreen" onerror="this.src='gb1.jpeg'">
+    <img id="fullImagePlayer" src="gb1.jpeg" alt="Gambar Fullscreen" onerror="this.src='gb1.jpeg'">
   </div>
 
   <div id="fullscreen-grid-overlay" class="fullscreen-stage-overlay">
@@ -635,44 +543,10 @@
     <div class="photo-grid-container" id="gridContainer"></div>
   </div>
 
-  <div id="adzan-overlay" class="fullscreen-stage-overlay">
-    <div class="visual-stage-container">
-      <div class="adzan-display-info">
-        <div class="adzan-sppg-name">SPPG KOTA SERANG SERANG SERANG 2</div>
-        <div class="adzan-status-title" id="adzanStatusTitle">MENGUMANDANGKAN ADZAN DZUHUR</div>
-        <div class="adzan-error-log" id="adzanErrorLog"></div>
-      </div>
-
-      <div class="gold-glow-ring"></div>
-
-      <div class="islamic-quotes-container" id="islamicQuotesContainer">
-        <div class="quote-headline" id="islamicHeadline">PANGGILAN SHOLAT</div>
-        <div class="quote-main-text" id="islamicMainText">"Sholat adalah tiang agama. Barangsiapa mendirikannya, maka ia telah mendirikan agama."</div>
-        <div class="quote-sub-text" id="islamicSubText">HR. Tirmidzi & Baihaqi</div>
-      </div>
-
-      <div class="wave-bars-container">
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-      </div>
-
-      <audio id="adzanAudioPlayer" preload="auto"></audio>
-    </div>
-  </div>
-
   <script>
     const IMAGE_DISPLAY_TIME = 5000;       
-    const FULL_IMAGE_DISPLAY_TIME = 10000; 
+    const FULL_IMAGE_DISPLAY_TIME = 5000;  
     const GRID_DISPLAY_TIME = 10000;       
-
-    let visitedGameSet = new Set();
-    let visitedMotivations = new Set();
-    let visitedQuran = new Set();
 
     let quoteTimeoutFallback = null;
     let gameTimerInterval = null;
@@ -692,15 +566,53 @@
       '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg'
     ];
 
-    // BANK SOAL LENGKAP SELURUH PELAJARAN
+    /* 🤣 BANK PERTANYAAN TEBAK-TEBAKAN LUCU 🤣 */
+    const funnyQuestions = [
+      {
+        subject: "TEBAK-TEBAKAN HUMOR",
+        question: "Hewan apa yang paling padat dan paling berat?",
+        options: ["Gajah Duduk", "Sapi Perah", "Semut Buatan", "Ular Piton"],
+        correct: 0,
+        speech: "Tebak tebakan humor. Hewan apa yang paling padat dan paling berat?"
+      },
+      {
+        subject: "TEBAK-TEBAKAN HUMOR",
+        question: "Buah apa yang paling tidak punya sopan santun?",
+        options: ["Pisang", "Mangga", "Buah Naga", "Mangga-ndeng pacar orang"],
+        correct: 3,
+        speech: "Tebak tebakan humor. Buah apa yang paling tidak punya sopan santun?"
+      },
+      {
+        subject: "TEBAK-TEBAKAN HUMOR",
+        question: "Benda apa yang kalau dipotong malah jadi lebih tinggi?",
+        options: ["Rumput", "Celana Panjang", "Pohon Banyan", "Rambut"],
+        correct: 1,
+        speech: "Tebak tebakan humor. Benda apa yang kalau dipotong malah jadi lebih tinggi?"
+      },
+      {
+        subject: "TEBAK-TEBAKAN HUMOR",
+        question: "Ikan apa yang paling matang dan siap dimakan?",
+        options: ["Ikan Mas", "Ikan Bakar", "Ikan Lele", "Ikan Tongkol"],
+        correct: 1,
+        speech: "Tebak tebakan humor. Ikan apa yang paling matang dan siap dimakan?"
+      },
+      {
+        subject: "TEBAK-TEBAKAN HUMOR",
+        question: "Ayam apa yang paling besar di dunia?",
+        options: ["Ayam Kampong", "Ayam Jago", "Ayam Semesta", "Ayam Negeri"],
+        correct: 2,
+        speech: "Tebak tebakan humor. Ayam apa yang paling besar di dunia?"
+      }
+    ];
+
+    /* 🧠 BANK PERTANYAAN EDUKASI & SAINS 🧠 */
     const generalKnowledgeQuestions = [
-      // IPA / SAINS
       {
         subject: "PELAJARAN: ILMU PENGETAHUAN ALAM (IPA)",
         question: "Planet manakah dalam tata surya kita yang dikenal sebagai Planet Merah?",
         options: ["Mars", "Venus", "Yupiter", "Saturnus"],
         correct: 0,
-        speech: "Pertanyaan IPA. Planet manakah dalam tata surya kita yang dikenal sebagai Planet Merah?"
+        speech: "Pertanyaan I P A. Planet manakah dalam tata surya kita yang dikenal sebagai Planet Merah?"
       },
       {
         subject: "PELAJARAN: BIOLOGI",
@@ -715,129 +627,27 @@
         options: ["Joule", "Volt", "Watt", "Ampere"],
         correct: 2,
         speech: "Pertanyaan Fisika. Satuan Internasional untuk mengukur daya listrik adalah?"
-      },
-      {
-        subject: "PELAJARAN: KIMIA",
-        question: "Simbol kimia untuk unsur Emas pada tabel periodik adalah...",
-        options: ["Ag", "Au", "Fe", "Cu"],
-        correct: 1,
-        speech: "Pertanyaan Kimia. Simbol kimia untuk unsur Emas adalah?"
-      },
-      // SEJARAH
-      {
-        subject: "PELAJARAN: SEJARAH INDONESIA",
-        question: "Siapakah tokoh yang membacakan Teks Proklamasi Kemerdekaan Indonesia pada tahun 1945?",
-        options: ["Ir. Soekarno", "Drs. Mohammad Hatta", "Sutan Sjahrir", "Ki Hajar Dewantara"],
-        correct: 0,
-        speech: "Pertanyaan Sejarah. Siapakah tokoh yang membacakan Teks Proklamasi Kemerdekaan Indonesia?"
-      },
-      {
-        subject: "PELAJARAN: SEJARAH DUNIA",
-        question: "Bangunan Candi Borobudur yang megah dibangun pada masa kerajaan...",
-        options: ["Majapahit", "Sriwijaya", "Mataram Kuno", "Singasari"],
-        correct: 2,
-        speech: "Pertanyaan Sejarah. Candi Borobudur dibangun pada masa kerajaan?"
-      },
-      // GEOGRAFI
-      {
-        subject: "PELAJARAN: GEOGRAFI",
-        question: "Apakah nama ibukota dari Provinsi Jawa Barat?",
-        options: ["Semarang", "Surabaya", "Bandung", "Serang"],
-        correct: 2,
-        speech: "Pertanyaan Geografi. Apakah nama ibukota dari Provinsi Jawa Barat?"
-      },
-      {
-        subject: "PELAJARAN: GEOGRAFI DUNIA",
-        question: "Benua terbesar dan memiliki populasi terbanyak di dunia adalah...",
-        options: ["Afrika", "Amerika", "Eropa", "Asia"],
-        correct: 3,
-        speech: "Pertanyaan Geografi. Benua terbesar di dunia adalah?"
-      },
-      // BAHASA & SASTRA
-      {
-        subject: "PELAJARAN: BAHASA INDONESIA",
-        question: "Persamaan kata atau kata yang memiliki arti sejenis dinamakan...",
-        options: ["Anonim", "Sinonim", "Antonim", "Homonim"],
-        correct: 1,
-        speech: "Pertanyaan Bahasa Indonesia. Persamaan kata dinamakan?"
-      },
-      {
-        subject: "PELAJARAN: BAHASA INGGRIS",
-        question: "What is the English translation for the word 'Matahari'?",
-        options: ["Moon", "Sun", "Star", "Cloud"],
-        correct: 1,
-        speech: "Pertanyaan Bahasa Inggris. What is the English translation for the word Matahari?"
-      },
-      // PKN & KEBUDAYAAN
-      {
-        subject: "PELAJARAN: PPKN",
-        question: "Lambang sila ke-3 dalam Pancasila (Persatuan Indonesia) adalah...",
-        options: ["Bintang", "Rantai Emas", "Pohon Beringin", "Kepala Banteng"],
-        correct: 2,
-        speech: "Pertanyaan PPKN. Lambang sila ke-3 dalam Pancasila adalah?"
-      },
-      {
-        subject: "PELAJARAN: SENI & BUDAYA",
-        question: "Alat musik tradisional 'Angklung' terbuat dari bambu dan berasal dari daerah...",
-        options: ["Jawa Barat", "Jawa Tengah", "Bali", "Sumatera Barat"],
-        correct: 0,
-        speech: "Pertanyaan Seni Budaya. Alat musik tradisional Angklung berasal dari daerah?"
       }
     ];
 
-    const motivationSubjects = [
-      "Keberhasilan sejati", "Impian besar", "Langkah kecil hari ini", "Semangat pantang menyerah", 
-      "Perjuangan tanpa henti", "Ketulusan hati", "Kerja keras dan doa", "Disiplin diri", 
-      "Keyakinan yang teguh", "Pengorbanan waktu"
-    ];
-    const motivationActions = [
-      "akan selalu membukakan jalan menuju kebaikan.", "merupakan fondasi paling kokoh dalam meraih masa depan.", 
-      "tidak akan pernah mengkhianati hasil yang dicapai.", "adalah kunci utama pembuka pintu-pintu kemudahan.", 
-      "mampu merubah setiap hambatan menjadi peluang emas.", "menciptakan keberkahan hidup yang tiada taranya."
-    ];
-    const motivationEndings = [
-      "Tetaplah berbuat baik kapan pun dan di mana pun.", "Fokus pada proses dan biarkan hasil mengukir sejarah.", 
-      "Jangan pernah menyerah sebelum batas kemampuanmu.", "Selalu bersyukur atas setiap proses yang dialami."
-    ];
+    const motivationSubjects = ["Keberhasilan sejati", "Impian besar", "Langkah kecil hari ini", "Semangat pantang menyerah"];
+    const motivationActions = ["akan selalu membukakan jalan menuju kebaikan.", "merupakan fondasi paling kokoh dalam meraih masa depan."];
+    const motivationEndings = ["Tetaplah berbuat baik kapan pun dan di mana pun.", "Fokus pada proses dan biarkan hasil mengukir sejarah."];
 
     function getUniqueMotivation() {
-      const totalCombinations = motivationSubjects.length * motivationActions.length * motivationEndings.length;
-      if (visitedMotivations.size >= totalCombinations) visitedMotivations.clear();
-
-      let text = "";
-      let attempt = 0;
-      do {
-        let s = motivationSubjects[Math.floor(Math.random() * motivationSubjects.length)];
-        let a = motivationActions[Math.floor(Math.random() * motivationActions.length)];
-        let e = motivationEndings[Math.floor(Math.random() * motivationEndings.length)];
-        text = `${s} ${a} ${e}`;
-        attempt++;
-      } while (visitedMotivations.has(text) && attempt < 100);
-
-      visitedMotivations.add(text);
-      return { text: text, ref: "Motivasi Semangat Hidup" };
+      let s = motivationSubjects[Math.floor(Math.random() * motivationSubjects.length)];
+      let a = motivationActions[Math.floor(Math.random() * motivationActions.length)];
+      let e = motivationEndings[Math.floor(Math.random() * motivationEndings.length)];
+      return { text: `${s} ${a} ${e}`, ref: "Motivasi Semangat Hidup" };
     }
 
     const quranData = [
       { text: "Maka sesungguhnya bersama kesulitan ada kemudahan. Sesungguhnya bersama kesulitan ada kemudahan.", ref: "QS. Ash-Sharh: 5-6" },
-      { text: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.", ref: "QS. Al-Baqarah: 286" },
-      { text: "Dan Dialah yang Maha Pengampun lagi Maha Penyayang.", ref: "QS. Az-Zumar: 53" },
-      { text: "Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.", ref: "QS. Ar-Ra'd: 28" },
-      { text: "Sesungguhnya Allah tidak akan mengubah keadaan suatu kaum sebelum mereka mengubah keadaan diri mereka sendiri.", ref: "QS. Ar-Ra'd: 11" }
+      { text: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.", ref: "QS. Al-Baqarah: 286" }
     ];
 
     function getUniqueQuranQuote() {
-      if (visitedQuran.size >= quranData.length) visitedQuran.clear();
-
-      let item;
-      let attempt = 0;
-      do {
-        item = quranData[Math.floor(Math.random() * quranData.length)];
-        attempt++;
-      } while (visitedQuran.has(item.text) && attempt < 100);
-
-      visitedQuran.add(item.text);
-      return item;
+      return quranData[Math.floor(Math.random() * quranData.length)];
     }
 
     let currentNormalVideoIdx = 0; 
@@ -869,9 +679,7 @@
         try {
           window.responsiveVoice.cancel();
           window.responsiveVoice.speak(text, "Indonesian Female", {
-            pitch: 1,
-            rate: 0.9,
-            volume: 1,
+            pitch: 1, rate: 0.9, volume: 1,
             onend: safeCallback,
             onerror: () => useBrowserNativeTTS(text, safeCallback)
           });
@@ -881,7 +689,6 @@
           return;
         }
       }
-
       useBrowserNativeTTS(text, safeCallback);
     }
 
@@ -892,10 +699,8 @@
         utterance.lang = 'id-ID';
         utterance.rate = 0.9;
         utterance.pitch = 1.0;
-
         utterance.onend = callback;
         utterance.onerror = callback;
-
         window.speechSynthesis.speak(utterance);
       } else {
         setTimeout(callback, Math.max(3000, text.length * 100));
@@ -912,6 +717,36 @@
         s1.innerHTML += `<img src="${filename}" class="media-element ${activeClass}" onerror="this.style.display='none'">`;
         s3.innerHTML += `<img src="${filename}" class="media-element ${activeClass}" onerror="this.style.display='none'">`;
       });
+    }
+
+    function setupImageSlideshow(screenId, intervalMs) {
+      const screen = document.getElementById(screenId);
+      let currentIndex = 0;
+
+      return setInterval(() => {
+        const validImages = Array.from(screen.querySelectorAll('img')).filter(img => img.style.display !== 'none');
+        if (validImages.length <= 1) return;
+
+        const currentImg = validImages[currentIndex];
+        
+        // Pilihan efek keluar acak: kiri, kanan, atau tengah
+        const exitEffects = ['exit-left', 'exit-right', 'exit-center'];
+        const chosenExit = exitEffects[Math.floor(Math.random() * exitEffects.length)];
+
+        currentImg.classList.remove('active');
+        currentImg.classList.add(chosenExit);
+
+        setTimeout(() => {
+          currentImg.classList.remove(chosenExit);
+        }, 800);
+
+        currentIndex = (currentIndex + 1) % validImages.length;
+        const nextImg = validImages[currentIndex];
+
+        // Gambar baru masuk dengan kilat petir & zoom out
+        nextImg.classList.add('active');
+
+      }, intervalMs);
     }
 
     function hideAllStages() {
@@ -974,20 +809,6 @@
       if (!fullPlayer.paused) fullPlayer.play().catch(e => console.log(e));
 
       requestWakeLock();
-    }
-
-    function setupImageSlideshow(screenId, intervalMs) {
-      const screen = document.getElementById(screenId);
-      let currentIndex = 0;
-
-      return setInterval(() => {
-        const validImages = Array.from(screen.querySelectorAll('img')).filter(img => img.style.display !== 'none');
-        if (validImages.length <= 1) return;
-
-        validImages[currentIndex].classList.remove('active');
-        currentIndex = (currentIndex + 1) % validImages.length;
-        validImages[currentIndex].classList.add('active');
-      }, intervalMs);
     }
 
     function playNormalVideoSequence() {
@@ -1074,7 +895,6 @@
 
       showStage(quoteScreen);
 
-      // 1. MOTIVASI HARI INI
       quoteScreen.className = 'fullscreen-stage-overlay show theme-motivation';
       bismillahEl.style.display = 'none';
 
@@ -1086,7 +906,6 @@
       speakMotivationWithDelay(motivation.text, () => {
         if (isAdzanPlaying) return;
 
-        // 2. FIRMAN ALLAH
         quoteScreen.className = 'fullscreen-stage-overlay show theme-quran';
         bismillahEl.style.display = 'block';
 
@@ -1096,17 +915,16 @@
         document.getElementById('quoteRef').innerText = `- ${quran.ref} -`;
 
         speakMotivationWithDelay(quran.text, () => {
-          if (!isAdzanPlaying) showBrainTeaserGame();
+          if (!isAdzanPlaying) showBrainTeaserGame(); // PERTAMA: TAMPILKAN KUIS EDUKASI
         });
       });
     }
 
-    // FUNGSI UNTUK MERANDOM MATEMATIKA & SOAL-SOAL PELAJARAN LAIN
-    function generateUniqueEducationalQuestion() {
-      // 50% Peluang muncul Matematika acak, 50% Peluang muncul Pelajaran Umum
-      const isMath = Math.random() < 0.5;
+    /* 🧠 1. FUNGSI KUIS EDUKASI (30 DETIK) 🧠 */
+    function generateEducationalQuestion() {
+      const randType = Math.random();
 
-      if (isMath) {
+      if (randType < 0.5) {
         let a = Math.floor(Math.random() * 890) + 100;
         let b = Math.floor(Math.random() * 890) + 100;
         let ans = a + b;
@@ -1126,17 +944,7 @@
           speech: `Pertanyaan Matematika. Berapakah hasil dari ${a} ditambah ${b}?`
         };
       } else {
-        if (visitedGameSet.size >= generalKnowledgeQuestions.length) visitedGameSet.clear();
-
-        let qObj;
-        let attempt = 0;
-        do {
-          qObj = generalKnowledgeQuestions[Math.floor(Math.random() * generalKnowledgeQuestions.length)];
-          attempt++;
-        } while (visitedGameSet.has(qObj.question) && attempt < 100);
-
-        visitedGameSet.add(qObj.question);
-        return qObj;
+        return generalKnowledgeQuestions[Math.floor(Math.random() * generalKnowledgeQuestions.length)];
       }
     }
 
@@ -1146,8 +954,9 @@
       if (gameTimerInterval) clearInterval(gameTimerInterval);
 
       const gameScreen = document.getElementById('fullscreen-game-screen');
-      const qObj = generateUniqueEducationalQuestion();
+      const qObj = generateEducationalQuestion();
 
+      document.getElementById('gameBadge').innerText = "🧠 ASAH OTAK & EDUKASI";
       document.getElementById('gameSubject').innerText = qObj.subject;
       document.getElementById('gameQuestion').innerText = qObj.question;
 
@@ -1172,10 +981,10 @@
       speakTextDirect(qObj.speech, () => {
         if (isAdzanPlaying) return;
 
-        timerBar.style.transition = 'width 15s linear';
+        timerBar.style.transition = 'width 30s linear';
         timerBar.style.width = '0%';
 
-        let secondsRemaining = 15;
+        let secondsRemaining = 30; // 30 DETIK KUIS EDUKASI
         
         gameTimerInterval = setInterval(() => {
           if (isAdzanPlaying) {
@@ -1185,10 +994,7 @@
 
           secondsRemaining--;
 
-          if (secondsRemaining === 3) speakTextDirect("Tiga.");
-          else if (secondsRemaining === 2) speakTextDirect("Dua.");
-          else if (secondsRemaining === 1) speakTextDirect("Satu.");
-          else if (secondsRemaining <= 0) {
+          if (secondsRemaining <= 0) {
             clearInterval(gameTimerInterval);
 
             const correctCard = document.getElementById(`game-opt-${qObj.correct}`);
@@ -1200,8 +1006,77 @@
             speakTextDirect(`Waktu habis! Jawaban yang benar adalah pilihan ${correctPrefix}, yaitu ${correctValue}`, () => {
               setTimeout(() => {
                 if (!isAdzanPlaying) {
+                  // SETELAH EDUKASI SELESAI, PINDAH KE TEBAK-TEBAKAN LUCU
+                  showFunnyQuizStage();
+                }
+              }, 2500);
+            });
+          }
+        }, 1000);
+      });
+    }
+
+    /* 🤣 2. FUNGSI TEBAK-TEBAKAN LUCU (30 DETIK) 🤣 */
+    function showFunnyQuizStage() {
+      if (isAdzanPlaying) return;
+
+      if (gameTimerInterval) clearInterval(gameTimerInterval);
+
+      const gameScreen = document.getElementById('fullscreen-game-screen');
+      const qObj = funnyQuestions[Math.floor(Math.random() * funnyQuestions.length)];
+
+      document.getElementById('gameBadge').innerText = "🤣 TEBAK-TEBAKAN LUCU";
+      document.getElementById('gameSubject').innerText = qObj.subject;
+      document.getElementById('gameQuestion').innerText = qObj.question;
+
+      const optionsGrid = document.getElementById('gameOptions');
+      optionsGrid.innerHTML = '';
+
+      const prefixes = ['A', 'B', 'C', 'D'];
+      qObj.options.forEach((optText, idx) => {
+        const card = document.createElement('div');
+        card.className = 'game-option-card';
+        card.id = `funny-opt-${idx}`;
+        card.innerHTML = `<span class="option-prefix">${prefixes[idx]}</span> <span>${optText}</span>`;
+        optionsGrid.appendChild(card);
+      });
+
+      showStage(gameScreen);
+
+      const timerBar = document.getElementById('gameTimerBar');
+      timerBar.style.transition = 'none';
+      timerBar.style.width = '100%';
+
+      speakTextDirect(qObj.speech, () => {
+        if (isAdzanPlaying) return;
+
+        timerBar.style.transition = 'width 30s linear';
+        timerBar.style.width = '0%';
+
+        let secondsRemaining = 30; // 30 DETIK TEBAK-TEBAKAN LUCU
+        
+        gameTimerInterval = setInterval(() => {
+          if (isAdzanPlaying) {
+            clearInterval(gameTimerInterval);
+            return;
+          }
+
+          secondsRemaining--;
+
+          if (secondsRemaining <= 0) {
+            clearInterval(gameTimerInterval);
+
+            const correctCard = document.getElementById(`funny-opt-${qObj.correct}`);
+            if (correctCard) correctCard.classList.add('correct-answer');
+
+            const correctPrefix = prefixes[qObj.correct];
+            const correctValue = qObj.options[qObj.correct];
+
+            speakTextDirect(`Waktu habis! Jawabannya adalah ${correctPrefix}, ${correctValue}`, () => {
+              setTimeout(() => {
+                if (!isAdzanPlaying) {
                   currentFullVideoIdx = 0;
-                  showFullVideoStage();
+                  showFullVideoStage(); // LANJUT KE VIDEO FULLSCREEN
                 }
               }, 2500);
             });
