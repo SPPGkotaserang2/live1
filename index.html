@@ -24,6 +24,61 @@
       width: 100vw;
     }
 
+    /* 📌 TOP HEADER (HARI, TANGGAL, JAM & JADWAL SHOLAT Minimalis) */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 99999;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 16px;
+      background: rgba(0, 15, 20, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 245, 212, 0.3);
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: #00f5d4;
+    }
+
+    .top-bar-left #clockText {
+      color: #fff;
+      background: rgba(0, 245, 212, 0.2);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid #00f5d4;
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+    }
+
+    .sholat-item {
+      display: flex;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .sholat-item .name { color: #d4af37; font-weight: 600; }
+    .sholat-item .time { color: #fff; font-weight: 700; }
+
     .screen-container {
       display: flex;
       width: 100vw;
@@ -33,6 +88,7 @@
       left: 0;
       z-index: 10;
       background: linear-gradient(135deg, #0d3b4c, #001f28, #104e5b);
+      padding-top: 35px; /* Memberi ruang untuk Top Bar */
     }
 
     .screen-container.hidden-screen {
@@ -73,22 +129,18 @@
       pointer-events: none;
     }
 
-    /* POSISI KELUAR 1: GESER KE KIRI */
     .media-element.exit-left {
       animation: slideExitLeft 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
     }
 
-    /* POSISI KELUAR 2: GESER KE KANAN */
     .media-element.exit-right {
       animation: slideExitRight 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
     }
 
-    /* POSISI KELUAR 3: MENYUSUT KE TENGAH */
     .media-element.exit-center {
       animation: shrinkExitCenter 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
     }
 
-    /* POSISI MASUK: ZOOM OUT SEPERTI PETIR (KILAT SANGAT CEPAT & TAJAM) */
     .media-element.active {
       opacity: 1;
       animation: lightningZoomIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -173,6 +225,7 @@
       opacity: 0;
       transition: opacity 0.4s ease-in-out;
       z-index: 99990;
+      padding-top: 35px;
     }
 
     .fullscreen-stage-overlay.show {
@@ -233,14 +286,14 @@
     }
 
     .sppg-title {
-      font-size: 2.5rem;
+      font-size: 2.3rem;
       font-weight: 900;
       letter-spacing: 4px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .quote-box {
-      padding: 35px 50px;
+      padding: 30px 45px;
       border-radius: 25px;
       max-width: 1150px;
       width: 100%;
@@ -260,7 +313,7 @@
     }
 
     .quote-text {
-      font-size: 2.1rem;
+      font-size: 1.9rem;
       font-weight: 700;
       color: #ffffff;
       margin-bottom: 18px;
@@ -272,13 +325,13 @@
     }
 
     .quote-reference {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 800;
       margin-bottom: 15px;
     }
 
     .quote-date {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       color: #e0fbfc;
       background: rgba(0, 95, 115, 0.8);
@@ -335,7 +388,7 @@
     }
 
     .game-question {
-      font-size: 2.1rem;
+      font-size: 2rem;
       font-weight: 800;
       color: #ffffff;
       margin-bottom: 25px;
@@ -359,7 +412,7 @@
       border: 2px solid rgba(255, 255, 255, 0.2);
       border-radius: 16px;
       padding: 16px 20px;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: #e0fbfc;
       display: flex;
@@ -453,7 +506,7 @@
     .grid-header-title {
       position: relative;
       z-index: 2;
-      font-size: 2.2rem;
+      font-size: 2rem;
       font-weight: 900;
       color: #e0fbfc;
       margin-bottom: 15px;
@@ -468,7 +521,7 @@
       grid-template-rows: repeat(4, 1fr);
       gap: 12px;
       width: 95vw;
-      height: 82vh;
+      height: 80vh;
     }
 
     .photo-card {
@@ -492,6 +545,21 @@
   </style>
 </head>
 <body onclick="globalUserGestureActivation()">
+
+  <!-- HEADER INFORMASI PINGGIR ATAS (KECIL) -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span id="dayDateText">Loading...</span>
+      <span id="clockText">00:00:00 WIB</span>
+    </div>
+    <div class="top-bar-right">
+      <div class="sholat-item"><span class="name">Subuh:</span><span class="time" id="sholat-subuh">04:35</span></div>
+      <div class="sholat-item"><span class="name">Dzuhur:</span><span class="time" id="sholat-dzuhur">12:00</span></div>
+      <div class="sholat-item"><span class="name">Ashar:</span><span class="time" id="sholat-ashar">15:18</span></div>
+      <div class="sholat-item"><span class="name">Maghrib:</span><span class="time" id="sholat-maghrib">18:02</span></div>
+      <div class="sholat-item"><span class="name">Isya:</span><span class="time" id="sholat-isya">19:14</span></div>
+    </div>
+  </div>
 
   <div id="sound-overlay" onclick="enableAudio(event)">
     <span>🔊 KLIK / TEKAN OK UNTUK AKTIFKAN SUARA MULTIMEDIA</span>
@@ -566,90 +634,164 @@
       '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg'
     ];
 
-    /* 🤣 BANK PERTANYAAN TEBAK-TEBAKAN LUCU 🤣 */
-    const funnyQuestions = [
-      {
-        subject: "TEBAK-TEBAKAN YUK",
-        question: "Hewan apa yang paling padat dan paling berat?",
-        options: ["Gajah Duduk", "Sapi Perah", "Semut Buatan", "Ular Piton"],
-        correct: 0,
-        speech: "Tebak tebakan yuk. Hewan apa yang paling padat dan paling berat?"
-      },
-      {
-        subject: "TEBAK-TEBAKAN YUK",
-        question: "Buah apa yang paling tidak punya sopan santun?",
-        options: ["Pisang", "Mangga", "Buah Naga", "Mangga-ndeng pacar orang"],
-        correct: 3,
-        speech: "Tebak tebakan yuk. Buah apa yang paling tidak punya sopan santun?"
-      },
-      {
-        subject: "TEBAK-TEBAKAN YUK",
-        question: "Benda apa yang kalau dipotong malah jadi lebih tinggi?",
-        options: ["Rumput", "Celana Panjang", "Pohon Banyan", "Rambut"],
-        correct: 1,
-        speech: "Tebak tebakan yuk. Benda apa yang kalau dipotong malah jadi lebih tinggi?"
-      },
-      {
-        subject: "TEBAK-TEBAKAN YUK",
-        question: "Ikan apa yang paling matang dan siap dimakan?",
-        options: ["Ikan Mas", "Ikan Bakar", "Ikan Lele", "Ikan Tongkol"],
-        correct: 1,
-        speech: "Tebak tebakan yuk. Ikan apa yang paling matang dan siap dimakan?"
-      },
-      {
-        subject: "TEBAK-TEBAKAN YUK",
-        question: "Ayam apa yang paling besar di dunia?",
-        options: ["Ayam Kampong", "Ayam Jago", "Ayam Semesta", "Ayam Negeri"],
-        correct: 2,
-        speech: "Tebak tebakan yuk. Ayam apa yang paling besar di dunia?"
-      }
-    ];
+    /* -----------------------------------------------------------------
+       1. FITUR REALTIME JAM, TANGGAL & JADWAL SHOLAT AUTOMATIS
+    ----------------------------------------------------------------- */
+    function updateClockAndDate() {
+      const now = new Date();
+      const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('dayDateText').innerText = now.toLocaleDateString('id-ID', optionsDate);
+      document.getElementById('clockText').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+    }
+    setInterval(updateClockAndDate, 1000);
+    updateClockAndDate();
 
-    /* 🧠 BANK PERTANYAAN EDUKASI & SAINS 🧠 */
-    const generalKnowledgeQuestions = [
-      {
-        subject: "PELAJARAN: ILMU PENGETAHUAN ALAM (IPA)",
-        question: "Planet manakah dalam tata surya kita yang dikenal sebagai Planet Merah?",
-        options: ["Mars", "Venus", "Yupiter", "Saturnus"],
-        correct: 0,
-        speech: "Pertanyaan I P A. Planet manakah dalam tata surya kita yang dikenal sebagai Planet Merah?"
-      },
-      {
-        subject: "PELAJARAN: BIOLOGI",
-        question: "Proses pembuatan makanan pada tumbuhan hijau dengan bantuan cahaya matahari disebut...",
-        options: ["Respirasi", "Fotosintesis", "Transpirasi", "Osmosis"],
-        correct: 1,
-        speech: "Pertanyaan Biologi. Proses pembuatan makanan pada tumbuhan hijau dengan bantuan cahaya matahari disebut?"
-      },
-      {
-        subject: "PELAJARAN: FISIKA",
-        question: "Satuan Internasional (SI) untuk mengukur daya listrik adalah...",
-        options: ["Joule", "Volt", "Watt", "Ampere"],
-        correct: 2,
-        speech: "Pertanyaan Fisika. Satuan Internasional untuk mengukur daya listrik adalah?"
+    // Fetch Jadwal Sholat Kemenag / Aladhan untuk Serang (Latitude: -6.12, Longitude: 106.15)
+    async function fetchPrayerTimes() {
+      try {
+        const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Serang&country=Indonesia&method=11');
+        const data = await response.json();
+        if(data && data.data && data.data.timings) {
+          const t = data.data.timings;
+          document.getElementById('sholat-subuh').innerText = t.Fajr;
+          document.getElementById('sholat-dzuhur').innerText = t.Dhuhr;
+          document.getElementById('sholat-ashar').innerText = t.Asr;
+          document.getElementById('sholat-maghrib').innerText = t.Maghrib;
+          document.getElementById('sholat-isya').innerText = t.Isha;
+        }
+      } catch(e) {
+        console.log("Menggunakan jadwal sholat default");
       }
-    ];
+    }
+    fetchPrayerTimes();
 
-    const motivationSubjects = ["Keberhasilan sejati", "Impian besar", "Langkah kecil hari ini", "Semangat pantang menyerah"];
-    const motivationActions = ["akan selalu membukakan jalan menuju kebaikan.", "merupakan fondasi paling kokoh dalam meraih masa depan."];
-    const motivationEndings = ["Tetaplah berbuat baik kapan pun dan di mana pun.", "Fokus pada proses dan biarkan hasil mengukir sejarah."];
+    /* -----------------------------------------------------------------
+       2. GENERATOR KATA-KATA MOTIVASI TAK TERHINGGA (INFINITE GENERATOR)
+    ----------------------------------------------------------------- */
+    const subjectsM = [
+      "Keberhasilan sejati", "Setiap langkah kecil", "Impian yang besar", 
+      "Kerja keras dan ketulusan", "Kebijaksanaan hidup", "Semangat pantang menyerah",
+      "Kedisiplinan yang konsisten", "Keberanian untuk mencoba", "Keyakinan dalam hati"
+    ];
+    const actionsM = [
+      "selalu membukakan jalan menuju kebaikan dan keberkahan.",
+      "merupakan fondasi paling kokoh dalam meraih masa depan gemilang.",
+      "akan membuahkan hasil terbaik pada waktu yang paling tepat.",
+      "mampu menembus batas ketidakmungkinan yang ada di depan mata.",
+      "menjadi penerang di kala kegelapan dan tantangan melanda."
+    ];
+    const endingsM = [
+      "Tetaplah berbuat baik kapan pun dan di mana pun Anda berada.",
+      "Fokus pada proses terbaik dan biarkan hasil mengukir sejarah.",
+      "Jangan pernah menyerah, karena kejayaan milik mereka yang bertahan.",
+      "Jadikan hari ini lebih baik dari hari kemarin.",
+      "Tersenyumlah, karena setiap usaha baik pasti dihargai."
+    ];
 
     function getUniqueMotivation() {
-      let s = motivationSubjects[Math.floor(Math.random() * motivationSubjects.length)];
-      let a = motivationActions[Math.floor(Math.random() * motivationActions.length)];
-      let e = motivationEndings[Math.floor(Math.random() * motivationEndings.length)];
-      return { text: `${s} ${a} ${e}`, ref: "Motivasi Semangat Hidup" };
+      let s = subjectsM[Math.floor(Math.random() * subjectsM.length)];
+      let a = actionsM[Math.floor(Math.random() * actionsM.length)];
+      let e = endingsM[Math.floor(Math.random() * endingsM.length)];
+      return { 
+        text: `${s} ${a} ${e}`, 
+        ref: "Motivasi Semangat Hidup" 
+      };
     }
 
-    const quranData = [
-      { text: "Maka sesungguhnya bersama kesulitan ada kemudahan. Sesungguhnya bersama kesulitan ada kemudahan.", ref: "QS. Ash-Sharh: 5-6" },
-      { text: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.", ref: "QS. Al-Baqarah: 286" }
+    /* -----------------------------------------------------------------
+       3. AL-QUR'AN 30 JUZ TAK TERHINGGA (Dinamis / Putar Semua Ayat)
+    ----------------------------------------------------------------- */
+    let currentQuranAyahIndex = Math.floor(Math.random() * 6236) + 1; // Total 6236 ayat dalam Al-Qur'an
+
+    async function getUniqueQuranQuote() {
+      try {
+        // Rotasi nomor ayat acak / berurutan dari 30 Juz
+        currentQuranAyahIndex = (currentQuranAyahIndex + Math.floor(Math.random() * 50)) % 6236 + 1;
+        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${currentQuranAyahIndex}/ed.id.indonesian`);
+        const data = await res.json();
+        if(data && data.data) {
+          return {
+            text: data.data.text,
+            ref: `QS. ${data.data.surah.englishName}: ${data.data.numberInSurah} (Juz ${data.data.juz})`
+          };
+        }
+      } catch (e) {}
+      
+      // Fallback lokal jika jaringan offline
+      const fallbackList = [
+        { text: "Maka sesungguhnya bersama kesulitan ada kemudahan.", ref: "QS. Ash-Sharh: 5" },
+        { text: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.", ref: "QS. Al-Baqarah: 286" },
+        { text: "Dan Dialah yang Maha Pengampun lagi Maha Penyayang.", ref: "QS. Al-Buruj: 14" }
+      ];
+      return fallbackList[Math.floor(Math.random() * fallbackList.length)];
+    }
+
+    /* -----------------------------------------------------------------
+       4. BANK PERTANYAAN EDUKASI & SAINS TAK TERHINGGA (INFINITE GENERATOR)
+    ----------------------------------------------------------------- */
+    const staticGeneralQuestions = [
+      { subject: "PELAJARAN: IPA", question: "Planet manakah dalam tata surya yang dikenal sebagai Planet Merah?", options: ["Mars", "Venus", "Yupiter", "Saturnus"], correct: 0, speech: "Planet manakah yang dikenal sebagai Planet Merah?" },
+      { subject: "PELAJARAN: BIOLOGI", question: "Proses pembuatan makanan pada tumbuhan dengan cahaya matahari disebut?", options: ["Respirasi", "Fotosintesis", "Transpirasi", "Osmosis"], correct: 1, speech: "Proses pembuatan makanan pada tumbuhan dengan cahaya matahari disebut?" },
+      { subject: "PELAJARAN: FISIKA", question: "Satuan Internasional untuk mengukur daya listrik adalah?", options: ["Joule", "Volt", "Watt", "Ampere"], correct: 2, speech: "Satuan Internasional untuk mengukur daya listrik adalah?" },
+      { subject: "PELAJARAN: KIMIA", question: "Simbol kimia untuk unsur Emas adalah?", options: ["Ag", "Au", "Fe", "Cu"], correct: 1, speech: "Simbol kimia untuk unsur Emas adalah?" },
+      { subject: "PELAJARAN: GEOGRAFI", question: "Danau terbesar di Indonesia adalah?", options: ["Danau Toba", "Danau Singkarak", "Danau Posso", "Danau Maninjau"], correct: 0, speech: "Danau terbesar di Indonesia adalah?" }
     ];
 
-    function getUniqueQuranQuote() {
-      return quranData[Math.floor(Math.random() * quranData.length)];
+    function generateEducationalQuestion() {
+      const type = Math.floor(Math.random() * 3);
+      if (type === 0) { // Soal Penjumlahan
+        let a = Math.floor(Math.random() * 890) + 100;
+        let b = Math.floor(Math.random() * 890) + 100;
+        let ans = a + b;
+        let opts = new Set([ans]);
+        while(opts.size < 4) opts.add(ans + (Math.floor(Math.random() * 40) - 20));
+        let arr = Array.from(opts).sort(() => Math.random() - 0.5);
+        return {
+          subject: "PELAJARAN: MATEMATIKA",
+          question: `Berapakah hasil dari ${a} + ${b} ?`,
+          options: arr.map(String),
+          correct: arr.indexOf(ans),
+          speech: `Berapakah hasil dari ${a} ditambah ${b}?`
+        };
+      } else if (type === 1) { // Soal Perkalian
+        let a = Math.floor(Math.random() * 20) + 5;
+        let b = Math.floor(Math.random() * 15) + 2;
+        let ans = a * b;
+        let opts = new Set([ans]);
+        while(opts.size < 4) opts.add(ans + (Math.floor(Math.random() * 20) - 10));
+        let arr = Array.from(opts).sort(() => Math.random() - 0.5);
+        return {
+          subject: "PELAJARAN: MATEMATIKA",
+          question: `Berapakah hasil dari ${a} × ${b} ?`,
+          options: arr.map(String),
+          correct: arr.indexOf(ans),
+          speech: `Berapakah hasil dari ${a} dikali ${b}?`
+        };
+      } else {
+        return staticGeneralQuestions[Math.floor(Math.random() * staticGeneralQuestions.length)];
+      }
     }
 
+    /* -----------------------------------------------------------------
+       5. BANK PERTANYAAN TEBAK-TEBAKAN TAK TERHINGGA
+    ----------------------------------------------------------------- */
+    const funnyQuestions = [
+      { subject: "TEBAK-TEBAKAN YUK", question: "Hewan apa yang paling padat dan paling berat?", options: ["Gajah Duduk", "Sapi Perah", "Semut Buatan", "Ular Piton"], correct: 0, speech: "Tebak tebakan yuk. Hewan apa yang paling padat dan paling berat?" },
+      { subject: "TEBAK-TEBAKAN YUK", question: "Buah apa yang paling tidak punya sopan santun?", options: ["Pisang", "Mangga", "Buah Naga", "Mangga-ndeng pacar orang"], correct: 3, speech: "Tebak tebakan yuk. Buah apa yang paling tidak punya sopan santun?" },
+      { subject: "TEBAK-TEBAKAN YUK", question: "Benda apa yang kalau dipotong malah jadi lebih tinggi?", options: ["Rumput", "Celana Panjang", "Pohon Banyan", "Rambut"], correct: 1, speech: "Tebak tebakan yuk. Benda apa yang kalau dipotong malah jadi lebih tinggi?" },
+      { subject: "TEBAK-TEBAKAN YUK", question: "Ikan apa yang paling matang dan siap dimakan?", options: ["Ikan Mas", "Ikan Bakar", "Ikan Lele", "Ikan Tongkol"], correct: 1, speech: "Tebak tebakan yuk. Ikan apa yang paling matang dan siap dimakan?" },
+      { subject: "TEBAK-TEBAKAN YUK", question: "Ayam apa yang paling besar di dunia?", options: ["Ayam Kampong", "Ayam Jago", "Ayam Semesta", "Ayam Negeri"], correct: 2, speech: "Tebak tebakan yuk. Ayam apa yang paling besar di dunia?" },
+      { subject: "TEBAK-TEBAKAN YUK", question: "Daun apa yang tidak pernah gugur dan bisa dimakan?", options: ["Daun Salam", "Daun Pisang", "Daun Telinga", "Daun Bayam"], correct: 3, speech: "Tebak tebakan yuk. Daun apa yang tidak pernah gugur dan bisa dimakan?" },
+      { subject: "TEBAK-TEBAKAN YUK", question: "Susu apa yang memiliki banyak roda?", options: ["Susu Sapi", "Susu Cokelat", "Susu Kental", "Susu-nan Kereta Api"], correct: 3, speech: "Tebak tebakan yuk. Susu apa yang memiliki banyak roda?" }
+    ];
+
+    function generateFunnyQuestion() {
+      return funnyQuestions[Math.floor(Math.random() * funnyQuestions.length)];
+    }
+
+    /* -----------------------------------------------------------------
+       ALUR PROGRAM & CONTROL LOGIC
+    ----------------------------------------------------------------- */
     let currentNormalVideoIdx = 0; 
     let currentFullVideoIdx = 0;
     let isAudioEnabled = false;
@@ -728,8 +870,6 @@
         if (validImages.length <= 1) return;
 
         const currentImg = validImages[currentIndex];
-        
-        // Pilihan efek keluar acak: kiri, kanan, atau tengah
         const exitEffects = ['exit-left', 'exit-right', 'exit-center'];
         const chosenExit = exitEffects[Math.floor(Math.random() * exitEffects.length)];
 
@@ -742,10 +882,7 @@
 
         currentIndex = (currentIndex + 1) % validImages.length;
         const nextImg = validImages[currentIndex];
-
-        // Gambar baru masuk dengan kilat petir & zoom out
         nextImg.classList.add('active');
-
       }, intervalMs);
     }
 
@@ -854,7 +991,7 @@
       if (quoteTimeoutFallback) clearTimeout(quoteTimeoutFallback);
 
       let hasTriggered = false;
-      const targetDurationMs = 30000;
+      const targetDurationMs = 25000;
       const startTime = Date.now();
 
       const proceedToNext = () => {
@@ -880,7 +1017,7 @@
       quoteTimeoutFallback = setTimeout(proceedToNext, targetDurationMs);
     }
 
-    function showQuotesSequence() {
+    async function showQuotesSequence() {
       if (isAdzanPlaying) return;
 
       const normalPlayer = document.getElementById('normalVideoPlayer');
@@ -895,6 +1032,7 @@
 
       showStage(quoteScreen);
 
+      // 1. TAMPILKAN MOTIVASI HARI INI
       quoteScreen.className = 'fullscreen-stage-overlay show theme-motivation';
       bismillahEl.style.display = 'none';
 
@@ -903,54 +1041,27 @@
       document.getElementById('dailyQuote').innerText = `"${motivation.text}"`;
       document.getElementById('quoteRef').innerText = `- ${motivation.ref} -`;
 
-      speakMotivationWithDelay(motivation.text, () => {
+      speakMotivationWithDelay(motivation.text, async () => {
         if (isAdzanPlaying) return;
 
+        // 2. TAMPILKAN FIRMAN ALLAH SWT (AL-QUR'AN)
         quoteScreen.className = 'fullscreen-stage-overlay show theme-quran';
         bismillahEl.style.display = 'block';
 
-        const quran = getUniqueQuranQuote();
+        const quran = await getUniqueQuranQuote();
         document.getElementById('quoteCategory').innerText = "FIRMAN ALLAH SWT (AL-QUR'AN)";
         document.getElementById('dailyQuote').innerText = `"${quran.text}"`;
         document.getElementById('quoteRef').innerText = `- ${quran.ref} -`;
 
         speakMotivationWithDelay(quran.text, () => {
-          if (!isAdzanPlaying) showBrainTeaserGame(); // PERTAMA: TAMPILKAN KUIS EDUKASI
+          if (!isAdzanPlaying) showBrainTeaserGame();
         });
       });
     }
 
-    /* 🧠 1. FUNGSI KUIS EDUKASI (30 DETIK) 🧠 */
-    function generateEducationalQuestion() {
-      const randType = Math.random();
-
-      if (randType < 0.5) {
-        let a = Math.floor(Math.random() * 890) + 100;
-        let b = Math.floor(Math.random() * 890) + 100;
-        let ans = a + b;
-
-        let choices = new Set([ans]);
-        while (choices.size < 4) {
-          let wrong = ans + (Math.floor(Math.random() * 30) - 15);
-          if (wrong !== ans && wrong > 0) choices.add(wrong);
-        }
-        let optionsArr = Array.from(choices).sort(() => Math.random() - 0.5);
-
-        return {
-          subject: "PELAJARAN: MATEMATIKA",
-          question: `Berapakah hasil dari ${a} + ${b} ?`,
-          options: optionsArr.map(n => n.toString()),
-          correct: optionsArr.indexOf(ans),
-          speech: `Pertanyaan Matematika. Berapakah hasil dari ${a} ditambah ${b}?`
-        };
-      } else {
-        return generalKnowledgeQuestions[Math.floor(Math.random() * generalKnowledgeQuestions.length)];
-      }
-    }
-
+    /* KUIS EDUKASI */
     function showBrainTeaserGame() {
       if (isAdzanPlaying) return;
-
       if (gameTimerInterval) clearInterval(gameTimerInterval);
 
       const gameScreen = document.getElementById('fullscreen-game-screen');
@@ -984,7 +1095,7 @@
         timerBar.style.transition = 'width 30s linear';
         timerBar.style.width = '0%';
 
-        let secondsRemaining = 30; // 30 DETIK KUIS EDUKASI
+        let secondsRemaining = 30;
         
         gameTimerInterval = setInterval(() => {
           if (isAdzanPlaying) {
@@ -1006,7 +1117,6 @@
             speakTextDirect(`Waktu habis! Jawaban yang benar adalah pilihan ${correctPrefix}, yaitu ${correctValue}`, () => {
               setTimeout(() => {
                 if (!isAdzanPlaying) {
-                  // SETELAH EDUKASI SELESAI, PINDAH KE TEBAK-TEBAKAN LUCU
                   showFunnyQuizStage();
                 }
               }, 2500);
@@ -1016,14 +1126,13 @@
       });
     }
 
-    /* 🤣 2. FUNGSI TEBAK-TEBAKAN LUCU (30 DETIK) 🤣 */
+    /* TEBAK-TEBAKAN LUCU */
     function showFunnyQuizStage() {
       if (isAdzanPlaying) return;
-
       if (gameTimerInterval) clearInterval(gameTimerInterval);
 
       const gameScreen = document.getElementById('fullscreen-game-screen');
-      const qObj = funnyQuestions[Math.floor(Math.random() * funnyQuestions.length)];
+      const qObj = generateFunnyQuestion();
 
       document.getElementById('gameBadge').innerText = "SPPG KOTA SERANG SERANG SERANG 2";
       document.getElementById('gameSubject').innerText = qObj.subject;
@@ -1053,7 +1162,7 @@
         timerBar.style.transition = 'width 30s linear';
         timerBar.style.width = '0%';
 
-        let secondsRemaining = 30; // 30 DETIK TEBAK-TEBAKAN LUCU
+        let secondsRemaining = 30;
         
         gameTimerInterval = setInterval(() => {
           if (isAdzanPlaying) {
@@ -1076,7 +1185,7 @@
               setTimeout(() => {
                 if (!isAdzanPlaying) {
                   currentFullVideoIdx = 0;
-                  showFullVideoStage(); // LANJUT KE VIDEO FULLSCREEN
+                  showFullVideoStage();
                 }
               }, 2500);
             });
