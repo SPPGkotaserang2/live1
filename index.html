@@ -47,6 +47,38 @@
       border: 1px solid rgba(0, 245, 212, 0.3);
     }
 
+    /* 📌 LOGO DI UJUNG KANAN ATAS (GAYA TRANSPARAN SEPERTI WATERMARK TV / SCTV) */
+    .top-logo-right {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      z-index: 1000000;
+      display: flex;
+      align-items: center;
+      background: transparent;
+      padding: 0;
+      border: none;
+      pointer-events: auto;
+    }
+
+    .top-logo-right img {
+      height: 200px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+      opacity: 0.75;
+      filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.7));
+      transition: opacity 0.3s ease;
+      
+      /* TAMBAHKAN BARIS INI */
+      margin-top: -70px; /* Ubah angka plus (+) untuk geser ke BAWAH, atau minus (-) untuk geser ke ATAS (contoh: -10px) */
+    }
+    
+
+    .top-logo-right img:hover {
+      opacity: 1; /* Kembali jelas saat disorot kursor */
+    }
+
     .time-date-row {
       display: flex;
       align-items: center;
@@ -312,6 +344,11 @@
         <div class="sholat-item" onclick="handleSholatClick('Isya')" ondblclick="handleSholatDblClick('Isya')"><span class="name">Isy:</span><span class="time" id="sholat-isya">19:11</span></div>
       </div>
     </div>
+  </div>
+
+  <!-- 📌 LOGO WATERMARK TRANSPARAN DI UJUNG KANAN ATAS (GAYA SCTV) -->
+  <div class="top-logo-right">
+    <img src="LOGO1.png" alt="Logo SPPG" onerror="this.style.display='none'">
   </div>
 
   <div id="sound-overlay" onclick="enableAudio(event)">
