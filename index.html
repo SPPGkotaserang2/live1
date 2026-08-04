@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SPPG KOTA SERANG 2 - Multi-Media Display</title>
-
-  <!-- SCRIPT TEXT TO SPEECH RESPONSIVE VOICE -->
-  <script src="https://code.responsivevoice.org/responsivevoice.js?key=free"></script>
+  <title>SPPG KOTA SERANG 2 - Multi-Media Display Dynamic</title>
 
   <style>
     * {
@@ -267,11 +264,14 @@
     .game-box { position: relative; z-index: 2; background: rgba(20, 15, 45, 0.9); padding: 30px 45px; border-radius: 25px; border: 3px solid #ff9e00; max-width: 1100px; width: 90%; display: flex; flex-direction: column; align-items: center; text-align: center; }
     .game-badge { background: #ff9e00; color: #10051d; font-weight: 900; font-size: 1.1rem; padding: 6px 24px; border-radius: 20px; margin-bottom: 12px; }
     .game-subject { color: #00f5d4; font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
-    .game-question { font-size: 2rem; font-weight: 800; color: #ffffff; margin-bottom: 25px; min-height: 90px; display: flex; align-items: center; justify-content: center; }
+    .game-question { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-bottom: 25px; min-height: 90px; display: flex; align-items: center; justify-content: center; }
+    
+    .timer-display { background: rgba(255, 0, 0, 0.2); border: 2px solid #ff4d4d; color: #ff4d4d; font-weight: 800; font-size: 1rem; padding: 4px 16px; border-radius: 15px; margin-bottom: 15px; }
+
     .game-options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-bottom: 20px; }
-    .game-option-card { background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 16px 20px; font-size: 1.3rem; font-weight: 700; color: #e0fbfc; display: flex; align-items: center; gap: 15px; text-align: left; }
-    .game-option-card.correct-answer { background: rgba(0, 245, 212, 0.25) !important; border-color: #00f5d4 !important; color: #00f5d4 !important; }
-    .option-prefix { background: rgba(255, 255, 255, 0.15); color: #ff9e00; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+    .game-option-card { background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 14px 18px; font-size: 1.1rem; font-weight: 700; color: #e0fbfc; display: flex; align-items: center; gap: 15px; text-align: left; transition: all 0.3s ease; }
+    .game-option-card.correct-answer { background: rgba(0, 245, 212, 0.3) !important; border-color: #00f5d4 !important; color: #00f5d4 !important; box-shadow: 0 0 15px rgba(0,245,212,0.5); }
+    .option-prefix { background: rgba(255, 255, 255, 0.15); color: #ff9e00; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0; }
 
     /* VIDEO FULLSCREEN STAGE */
     #fullscreen-video-overlay { z-index: 99992; background: #000 !important; }
@@ -315,7 +315,7 @@
   </div>
 
   <div id="sound-overlay" onclick="enableAudio(event)">
-    <span>🔊 KLIK / TEKAN OK UNTUK AKTIFKAN SUARA MULTIMEDIA</span>
+    <span>🔊 KLIK / TEKAN OK UNTUK AKTIFKAN SUARA MULTIMEDIA & VOICE</span>
   </div>
 
   <!-- CONTAINER UTAMA (3 SCREEN DISPLAY) -->
@@ -350,8 +350,9 @@
 
   <div id="fullscreen-game-screen" class="fullscreen-stage-overlay">
     <div class="game-box">
-      <div class="game-badge">KUIZ DAN TEBAK-TEBAKAN</div>
+      <div class="game-badge" id="gameBadgeTitle">SPPG KOTA SERANG SERANG SERANG 2</div>
       <div class="game-subject" id="gameSubject">PELAJARAN</div>
+      <div class="timer-display" id="timerDisplay">Waktu Berpikir: 30 Detik</div>
       <div class="game-question" id="gameQuestion">Memuat Pertanyaan...</div>
       <div class="game-options-grid" id="gameOptions"></div>
     </div>
@@ -362,7 +363,7 @@
   </div>
 
   <div id="fullscreen-image-overlay" class="fullscreen-stage-overlay">
-    <img id="fullImagePlayer" src="STR1.jpg" alt="Gambar Fullscreen" onerror="this.src='STR1.JPG'">
+    <img id="fullImagePlayer" src="STR1.jpg" alt="Gambar Fullscreen" onerror="this.src='gb1.jpeg'">
   </div>
 
   <div id="fullscreen-grid-overlay" class="fullscreen-stage-overlay">
@@ -374,12 +375,13 @@
     const IMAGE_DISPLAY_TIME = 5000;       
     const FULL_IMAGE_DISPLAY_TIME = 5000;  
     const GRID_DISPLAY_TIME = 10000;       
-    const SECTION_DURATION_MS = 30000;     // Diatur masing-masing 30 Detik untuk Kata-kata, Al-Quran, dan Tebak-tebakan
+    const SECTION_DURATION_MS = 30000;     
 
     let isAudioEnabled = false;
     let isAdzanPlaying = false;
     let textRotationInterval = null;
     let clickTimeout = null;
+    let activeQuizTimer = null;
 
     let currentNormalVideoIdx = 0;
     let currentFullVideoIdx = 0;
@@ -388,8 +390,8 @@
     let normalVideosList = ['v1.mp4', 'v2.mp4', 'v3.mp4'];
     let fullVideosList = ['videofull1.mp4', 'videofull2.mp4', 'videofull3.mp4', 'videofull4.mp4', 'videofull5.mp4'];
     
-    let dapurPhotosList = ['dpr1.jpeg', 'dpr2.jpeg', 'dpr3.jpeg', 'dpr4.jpeg', 'dpr5.jpeg', 'dpr6.jpeg', 'dpr7.jpeg', 'dpr8.jpeg', 'dpr9.jpeg', 'dpr10.jpeg'];
-    let distribusiPhotosList = ['1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg'];
+    let dapurPhotosList = ['dpr1.jpeg', 'dpr2.jpeg', 'dpr3.jpeg', 'dpr4.jpeg', 'dpr5.jpeg', 'dpr6.jpeg', 'dpr7.jpeg', 'dpr8.jpeg', 'dpr9.jpeg', 'dpr10.jpeg', 'dpr11.jpeg', 'dpr12.jpeg', 'dpr13.jpeg', 'dpr14.jpeg', 'dpr15.jpeg', 'dpr16.jpeg', 'dpr17.jpeg', 'dpr18.jpeg', 'dpr19.jpeg', 'dpr20.jpeg'];
+    let distribusiPhotosList = ['1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg', '13.jpeg', '14.jpeg', '15.jpeg', '16.jpeg', '17.jpeg', '18.jpeg', '19.jpeg', '20.jpeg'];
 
     const adzanAudioMap = { 'Subuh': 'adzan_subuh.mp3', 'Dzuhur': 'adzan.mp3', 'Ashar': 'adzan.mp3', 'Maghrib': 'adzan.mp3', 'Isya': 'adzan.mp3' };
 
@@ -406,7 +408,134 @@
       "“Basahi bibir dan hatimu dengan puji-pujian kepada Rasulullah SAW setiap saat.”"
     ];
 
-    /* 🕌 FETCH JADWAL SHOLAT SINKRON KOTA SERANG BANTEN (METHOD 20 = KEMENAG / BIMAS ISLAM) */
+    /* ==========================================================
+       1. BANK DATA KATA-KATA MOTIVASI TAK TERHINGGA
+       ========================================================== */
+    const motivationalBank = [
+      { text: "Setiap langkah kecil adalah fondasi menuju masa depan yang gemilang.", ref: "Kata Motivasi" },
+      { text: "Kesuksesan bukanlah milik orang yang pintar, tetapi milik mereka yang tak pernah menyerah.", ref: "Inspirasi Harian" },
+      { text: "Jangan batasi tantanganmu, tantanglah batasmu. Hari ini harus lebih baik dari kemarin.", ref: "Semangat Juang" },
+      { text: "Konsistensi adalah kunci utama dari pencapaian besar yang tertunda.", ref: "Kata Motivasi" },
+      { text: "Kegagalan adalah sukses yang tertunda, bangkitlah dan buktikan kemampuanmu.", ref: "Motivasi Hidup" },
+      { text: "Waktu terbaik untuk memulai adalah sekarang. Jangan menunda apa yang bisa dikerjakan hari ini.", ref: "Prinsip Sukses" },
+      { text: "Ubah lelahmu menjadi lillah, maka setiap keringat bernilai ibadah dan berkah.", ref: "Motivasi Islami" },
+      { text: "Orang hebat tidak lahir dari kemudahan, melainkan dari tempaan badai kesulitan.", ref: "Kata Bijak" },
+      { text: "Senyuman dan kerja keras adalah modal terbaik untuk menghadapi dunia hari ini.", ref: "Energi Positif" },
+      { text: "Keyakinan adalah awal mula dari segala hal besar yang akan terwujud.", ref: "Inspirasi Pagi" }
+    ];
+
+    /* ==========================================================
+       2. BANK DATA AL-QUR'AN (TERJEMAHAN ARTI SAJA DARI 30 JUZ)
+       ========================================================== */
+    const quranTranslationBank = [
+      { text: "Maka sesungguhnya bersama kesulitan ada kemudahan.", ref: "QS. Ash-Sharh: 5 (Juz 30)" },
+      { text: "Dan sesungguhnya telah Kami mudahkan Al-Quran untuk pelajaran, maka adakah orang yang mengambil pelajaran?", ref: "QS. Al-Qamar: 17 (Juz 27)" },
+      { text: "Dan Dialah yang menciptakan malam dan siang, matahari dan bulan. Masing-masing beredar pada garis edarnya.", ref: "QS. Al-Anbiya: 33 (Juz 17)" },
+      { text: "Dan bertawakkallah kepada Allah Yang Hidup (Kekal) yang tidak mati, dan bertasbihlah dengan memuji-Nya.", ref: "QS. Al-Furqan: 58 (Juz 19)" },
+      { text: "Hai orang-orang yang beriman, bertakwalah kepada Allah dan hendaklah setiap diri memperhatikan apa yang telah diperbuatnya untuk hari esok.", ref: "QS. Al-Hasyr: 18 (Juz 28)" },
+      { text: "Dan bersabarlah kamu, karena sesungguhnya Allah tidak menyia-nyiakan pahala orang-orang yang berbuat kebaikan.", ref: "QS. Hud: 115 (Juz 12)" },
+      { text: "Dan mintalah pertolongan (kepada Allah) dengan sabar dan sholat.", ref: "QS. Al-Baqarah: 45 (Juz 1)" },
+      { text: "Ingatlah hanya kepada Allah-lah hati menjadi tenteram.", ref: "QS. Ar-Ra'd: 28 (Juz 13)" },
+      { text: "Wahai Tuhan kami, berikanlah kepada kami kebaikan di dunia dan kebaikan di akhirat, dan peliharalah kami dari siksa neraka.", ref: "QS. Al-Baqarah: 201 (Juz 2)" },
+      { text: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.", ref: "QS. Al-Baqarah: 286 (Juz 3)" },
+      { text: "Dan rendahkanlah dirimu terhadap keduanya dengan penuh kasih sayang.", ref: "QS. Al-Isra: 24 (Juz 15)" },
+      { text: "Dan katakanlah: Ya Tuhanku, tambahkanlah ilmu kepadaku.", ref: "QS. Taha: 114 (Juz 16)" },
+      { text: "Maka ingatlah kepada-Ku, niscaya Aku ingat pula kepadamu.", ref: "QS. Al-Baqarah: 152 (Juz 2)" },
+      { text: "Dan barangsiapa bertakwa kepada Allah, niscaya Dia memperbuat baginya jalan keluar.", ref: "QS. At-Talaq: 2 (Juz 28)" },
+      { text: "Sesungguhnya rahmat Allah sangat dekat kepada orang-orang yang berbuat kebaikan.", ref: "QS. Al-A'raf: 56 (Juz 8)" }
+    ];
+
+    /* ==========================================================
+       3. BANK DATA EDUKASI / SOAL SAINS & UMUM
+       ========================================================== */
+    const educationQuizBank = [
+      {
+        subject: "Pelajaran: Sains / Astronomi",
+        question: "Planet manakah yang dikenal sebagai Planet Merah?",
+        options: ["Mars", "Venus", "Yupiter", "Saturnus"],
+        correct: 0
+      },
+      {
+        subject: "Pelajaran: Biologi / Anatomi",
+        question: "Organ tubuh manusia yang berfungsi untuk memompa darah adalah?",
+        options: ["Paru-paru", "Jantung", "Ginjal", "Hati"],
+        correct: 1
+      },
+      {
+        subject: "Pelajaran: Fisika Dasar",
+        question: "Apa unsur kimia utama dari air bersih?",
+        options: ["H2O", "CO2", "O2", "NaCl"],
+        correct: 0
+      },
+      {
+        subject: "Pelajaran: Geografi Nusantara",
+        question: "Ibukota Provinsi Banten berada di kota mana?",
+        options: ["Serang", "Tangerang", "Cilegon", "Rangkasbitung"],
+        correct: 0
+      },
+      {
+        subject: "Pelajaran: Sains / Alam",
+        question: "Tumbuhan melakukan proses pembuatan makanan sendiri yang disebut dengan?",
+        options: ["Respirasi", "Fotosintesis", "Transpirasi", "Erosi"],
+        correct: 1
+      },
+      {
+        subject: "Pelajaran: Sejarah & Pengetahuan",
+        question: "Benua terbesar di permukaan bumi adalah benua apa?",
+        options: ["Afrika", "Amerika", "Asia", "Eropa"],
+        correct: 2
+      },
+      {
+        subject: "Pelajaran: Kimia & Lingkungan",
+        question: "Gas yang dihirup oleh manusia untuk pernapasan sehari-hari adalah?",
+        options: ["Karbon Dioksida", "Oksigen", "Nitrogen", "Hidrogen"],
+        correct: 1
+      }
+    ];
+
+    /* ==========================================================
+       4. BANK DATA TEBAK-TEBAKAN / KUIS SERU
+       ========================================================== */
+    const tebakTebakanBank = [
+      {
+        subject: "Tebak-Tebakan: Asah Otak",
+        question: "Gajah apa yang belalainya pendek?",
+        options: ["Gajah bengkak", "Gajah cilik (kecil)", "Gajah sumatera", "Gajah afrika"],
+        correct: 1
+      },
+      {
+        subject: "Tebak-Tebakan: Lucu & Kreatif",
+        question: "Hewan apa yang paling patuh dan disiplin sama lalu lintas?",
+        options: ["Kuda zebra", "Kucing", "Anjing", "Monyet"],
+        correct: 0
+      },
+      {
+        subject: "Tebak-Tebakan: Jenaka",
+        question: "Kucing apa yang kalau dikejar sering lari masuk kantong?",
+        options: ["Kucing garong", "Kantong kresek", "Kucing anggora", "Kucing persia"],
+        correct: 1
+      },
+      {
+        subject: "Tebak-Tebakan: Teka-Teki Ringan",
+        question: "Kenapa pohon pisang daunnya bisa berbentuk melebar?",
+        options: ["Karena warnanya hijau", "Karena tidak punya payung", "Supaya bisa meneduhi rumput", "Karena niat dari kecil"],
+        correct: 1
+      },
+      {
+        subject: "Tebak-Tebakan: Logika Unik",
+        question: "Benda apa yang kalau dibeli malah bertambah panjang?",
+        options: ["Kain meteran", "Tali rafia", "Kertas rol", "Pita kado"],
+        correct: 0
+      },
+      {
+        subject: "Tebak-Tebakan: Humor Pintar",
+        question: "Lampu apa yang kalau dipecahkan keluar orangnya?",
+        options: ["Lampu neon", "Lampu tetangga", "Lampu belajar", "Lampu merah"],
+        correct: 1
+      }
+    ];
+
+    /* 🕌 FETCH JADWAL SHOLAT SINKRON KOTA SERANG BANTEN */
     async function fetchPrayerTimesSerang() {
       try {
         const today = new Date();
@@ -425,8 +554,6 @@
           document.getElementById('sholat-ashar').innerText = t.Asr.substring(0, 5);
           document.getElementById('sholat-maghrib').innerText = t.Maghrib.substring(0, 5);
           document.getElementById('sholat-isya').innerText = t.Isha.substring(0, 5);
-          
-          console.log("Jadwal Sholat Kota Serang (Kemenag) Berhasil Disinkronkan!");
         }
       } catch (error) {
         console.warn("Gagal mengambil data sholat, menggunakan cadangan waktu Kota Serang.", error);
@@ -540,6 +667,7 @@
     function triggerAdzanSequence(namaSholat) {
       if (!isAudioEnabled) enableAudio();
       isAdzanPlaying = true;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
 
       const normalPlayer = document.getElementById('normalVideoPlayer');
       const sholawatAudio = document.getElementById('sholawatAudio');
@@ -592,6 +720,7 @@
     function playSholawatDirectly() {
       if (!isAudioEnabled) enableAudio();
       isAdzanPlaying = true;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
 
       const normalPlayer = document.getElementById('normalVideoPlayer');
       const adzanAudio = document.getElementById('adzanAudio');
@@ -652,7 +781,9 @@
       }
     }
 
-    /* 1. KATA-KATA MOTIVASI (DURASI 30 DETIK) */
+    /* ==========================================================
+       1. KATA-KATA MOTIVASI (HANYA ISI TEKS SAJA)
+       ========================================================== */
     function showQuotesSequence() {
       if (isAdzanPlaying) return;
 
@@ -663,69 +794,183 @@
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       document.getElementById('currentDate').innerText = today.toLocaleDateString('id-ID', options);
 
+      const randomMotivasi = motivationalBank[Math.floor(Math.random() * motivationalBank.length)];
+
       const quoteScreen = document.getElementById('fullscreen-quote-screen');
       showStage(quoteScreen);
 
       quoteScreen.className = 'fullscreen-stage-overlay show theme-motivation';
       document.getElementById('quoteCategory').innerText = "MOTIVASI HARI INI";
-      document.getElementById('dailyQuote').innerText = `"Setiap langkah kecil adalah fondasi menuju masa depan yang gemilang."`;
-      document.getElementById('quoteRef').innerText = `- Kata Motivasi -`;
+      document.getElementById('dailyQuote').innerText = `"${randomMotivasi.text}"`;
+      document.getElementById('quoteRef').innerText = `- ${randomMotivasi.ref} -`;
 
-      speakTextDirect("Setiap langkah kecil adalah fondasi menuju masa depan yang gemilang.", () => {});
+      // 🔊 HANYA MEMBACA TEKS ISI MOTIVASI TANPA JUDUL
+      speakTextDirect(randomMotivasi.text, () => {});
 
-      // Berjalan persis selama 30 detik sebelum lanjut ke Al-Quran
       setTimeout(() => {
         if (!isAdzanPlaying) showQuranSequence();
       }, SECTION_DURATION_MS);
     }
 
-    /* 2. AL-QURAN EDUKASI (DURASI 30 DETIK) */
+    /* ==========================================================
+       2. AL-QURAN EDUKASI (HANYA ISI TEKS/TERJEMAHAN SAJA)
+       ========================================================== */
     function showQuranSequence() {
       if (isAdzanPlaying) return;
+
+      const randomQuran = quranTranslationBank[Math.floor(Math.random() * quranTranslationBank.length)];
 
       const quoteScreen = document.getElementById('fullscreen-quote-screen');
       showStage(quoteScreen);
 
       quoteScreen.className = 'fullscreen-stage-overlay show theme-quran';
-      document.getElementById('quoteCategory').innerText = "ARTI AYAT AL-QUR'AN";
-      document.getElementById('dailyQuote').innerText = `"Maka sesungguhnya bersama kesulitan ada kemudahan."`;
-      document.getElementById('quoteRef').innerText = `- QS. Ash-Sharh: 5 -`;
+      document.getElementById('quoteCategory').innerText = "ARTI AYAT AL-QUR'AN (30 JUZ)";
+      document.getElementById('dailyQuote').innerText = `"${randomQuran.text}"`;
+      document.getElementById('quoteRef').innerText = `- ${randomQuran.ref} -`;
 
-      speakTextDirect("Maka sesungguhnya bersama kesulitan ada kemudahan.", () => {});
+      // 🔊 HANYA MEMBACA TERJEMAHAN AYAT & SURATNYA TANPA JUDUL KATEGORI
+      speakTextDirect(`${randomQuran.text}. ${randomQuran.ref}`, () => {});
 
-      // Berjalan persis selama 30 detik sebelum lanjut ke Tebak-Tebakan
       setTimeout(() => {
-        if (!isAdzanPlaying) showBrainTeaserGame();
+        if (!isAdzanPlaying) showEducationQuizStage();
       }, SECTION_DURATION_MS);
     }
 
-    /* 3. TEBAK-TEBAKAN / KUIZ (DURASI 30 DETIK) */
-    function showBrainTeaserGame() {
+    /* ==========================================================
+       3. EDUKASI / SOAL (HANYA PERTANYAAN DAN PILIHAN SAJA)
+       ========================================================== */
+    function showEducationQuizStage() {
       if (isAdzanPlaying) return;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
+
+      const randomEdu = educationQuizBank[Math.floor(Math.random() * educationQuizBank.length)];
 
       const gameScreen = document.getElementById('fullscreen-game-screen');
-      document.getElementById('gameSubject').innerText = "PELAJARAN: SAINS";
-      document.getElementById('gameQuestion').innerText = "Planet manakah yang dikenal sebagai Planet Merah?";
+      document.getElementById('gameBadgeTitle').innerText = "SPPG KOTA SERANG SERANG SERANG 2";
+      document.getElementById('gameSubject').innerText = randomEdu.subject;
+      document.getElementById('gameQuestion').innerText = randomEdu.question;
+      
+      const timerEl = document.getElementById('timerDisplay');
+      let timeLeft = 30;
+      timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik (Menunggu Jawaban)`;
 
       const optionsGrid = document.getElementById('gameOptions');
-      optionsGrid.innerHTML = `
-        <div class="game-option-card correct-answer"><span class="option-prefix">A</span> <span>Mars</span></div>
-        <div class="game-option-card"><span class="option-prefix">B</span> <span>Venus</span></div>
-        <div class="game-option-card"><span class="option-prefix">C</span> <span>Yupiter</span></div>
-        <div class="game-option-card"><span class="option-prefix">D</span> <span>Saturnus</span></div>
-      `;
+      const letters = ['A', 'B', 'C', 'D'];
+      optionsGrid.innerHTML = '';
+      
+      randomEdu.options.forEach((opt, idx) => {
+        optionsGrid.innerHTML += `
+          <div class="game-option-card" id="edu-opt-${idx}">
+            <span class="option-prefix">${letters[idx]}</span> 
+            <span>${opt}</span>
+          </div>
+        `;
+      });
 
       showStage(gameScreen);
 
-      speakTextDirect("Planet manakah yang dikenal sebagai Planet Merah?", () => {});
+      // 🔊 HANYA MEMBACA PERTANYAAN DAN PILIHAN JAWABAN TANPA JUDUL KATEGORI
+      let speechText = `${randomEdu.question}. Pilihan jawaban: `;
+      randomEdu.options.forEach((opt, idx) => { speechText += `Pilihan ${letters[idx]}, ${opt}. `; });
+      
+      speakTextDirect(speechText, () => {});
 
-      // Berjalan persis selama 30 detik sebelum lanjut ke Video Fullscreen berikutnya
-      setTimeout(() => {
-        if (!isAdzanPlaying) {
-          currentFullVideoIdx = 0;
-          showFullVideoStage();
+      let countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik`;
+        } else {
+          clearInterval(countdownInterval);
         }
-      }, SECTION_DURATION_MS);
+      }, 1000);
+
+      activeQuizTimer = setTimeout(() => {
+        clearInterval(countdownInterval);
+        timerEl.innerText = `✅ Waktu Habis! Jawaban yang Benar Ditampilkan:`;
+
+        const correctCard = document.getElementById(`edu-opt-${randomEdu.correct}`);
+        if (correctCard) correctCard.classList.add('correct-answer');
+
+        const correctAnsText = randomEdu.options[randomEdu.correct];
+        
+        // 🔊 HANYA MEMBACA JAWABAN BENAR SAJA
+        speakTextDirect(`Jawaban yang benar adalah: ${correctAnsText}`, () => {});
+
+        activeQuizTimer = setTimeout(() => {
+          if (!isAdzanPlaying) showBrainTeaserGame();
+        }, 6000);
+
+      }, 30000);
+    }
+
+    /* ==========================================================
+       4. TEBAK-TEBAKAN (HANYA PERTANYAAN DAN PILIHAN SAJA)
+       ========================================================== */
+    function showBrainTeaserGame() {
+      if (isAdzanPlaying) return;
+      if (activeQuizTimer) clearTimeout(activeQuizTimer);
+
+      const randomTeaser = tebakTebakanBank[Math.floor(Math.random() * tebakTebakanBank.length)];
+
+      const gameScreen = document.getElementById('fullscreen-game-screen');
+      document.getElementById('gameBadgeTitle').innerText = "SPPG KOTA SERANG SERANG SERANG 2";
+      document.getElementById('gameSubject').innerText = randomTeaser.subject;
+      document.getElementById('gameQuestion').innerText = randomTeaser.question;
+
+      const timerEl = document.getElementById('timerDisplay');
+      let timeLeft = 30;
+      timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik (Menunggu Jawaban)`;
+
+      const optionsGrid = document.getElementById('gameOptions');
+      const letters = ['A', 'B', 'C', 'D'];
+      optionsGrid.innerHTML = '';
+
+      randomTeaser.options.forEach((opt, idx) => {
+        optionsGrid.innerHTML += `
+          <div class="game-option-card" id="teaser-opt-${idx}">
+            <span class="option-prefix">${letters[idx]}</span> 
+            <span>${opt}</span>
+          </div>
+        `;
+      });
+
+      showStage(gameScreen);
+
+      // 🔊 HANYA MEMBACA PERTANYAAN TEBAK-TEBAKAN DAN PILIHANNYA TANPA JUDUL
+      let speechText = `${randomTeaser.question}. Pilihan jawabannya: `;
+      randomTeaser.options.forEach((opt, idx) => { speechText += `Pilihan ${letters[idx]}, ${opt}. `; });
+
+      speakTextDirect(speechText, () => {});
+
+      let countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          timerEl.innerText = `⏱️ Waktu Berpikir: ${timeLeft} Detik`;
+        } else {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+
+      activeQuizTimer = setTimeout(() => {
+        clearInterval(countdownInterval);
+        timerEl.innerText = `✅ Waktu Habis! Jawaban yang Benar Ditampilkan:`;
+
+        const correctCard = document.getElementById(`teaser-opt-${randomTeaser.correct}`);
+        if (correctCard) correctCard.classList.add('correct-answer');
+
+        const correctAnsText = randomTeaser.options[randomTeaser.correct];
+        
+        // 🔊 HANYA MEMBACA JAWABAN BENAR SAJA
+        speakTextDirect(`Jawaban yang benar adalah: ${correctAnsText}`, () => {});
+
+        activeQuizTimer = setTimeout(() => {
+          if (!isAdzanPlaying) {
+            currentFullVideoIdx = 0;
+            showFullVideoStage();
+          }
+        }, 6000);
+
+      }, 30000);
     }
 
     function showFullVideoStage() {
@@ -846,35 +1091,42 @@
       normalPlayer.muted = false;
       fullPlayer.muted = false;
 
-      if (window.responsiveVoice) window.responsiveVoice.init();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const dummyUtter = new SpeechSynthesisUtterance("");
+        window.speechSynthesis.speak(dummyUtter);
+      }
+
       if (!normalPlayer.paused) normalPlayer.play().catch(() => {});
       if (!fullPlayer.paused) fullPlayer.play().catch(() => {});
     }
 
+    /* 🔊 FUNGSI VOICE UTAMA MENGGUNAKAN WEB SPEECH API */
     function speakTextDirect(text, onEndCallback) {
-      let hasFinished = false;
-      const safeCallback = () => {
-        if (!hasFinished) {
-          hasFinished = true;
-          if (typeof onEndCallback === 'function') onEndCallback();
-        }
-      };
-
-      if (window.responsiveVoice && typeof window.responsiveVoice.speak === 'function') {
-        try {
-          window.responsiveVoice.cancel();
-          window.responsiveVoice.speak(text, "Indonesian Female", {
-            pitch: 1, rate: 0.9, volume: 1,
-            onend: safeCallback,
-            onerror: safeCallback
-          });
-          return;
-        } catch(e) {
-          safeCallback();
-          return;
-        }
+      if (!('speechSynthesis' in window)) {
+        if (typeof onEndCallback === 'function') onEndCallback();
+        return;
       }
-      safeCallback();
+
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'id-ID';
+        utterance.rate = 0.95; 
+        utterance.pitch = 1.0;
+
+        utterance.onend = function() {
+          if (typeof onEndCallback === 'function') onEndCallback();
+        };
+
+        utterance.onerror = function() {
+          if (typeof onEndCallback === 'function') onEndCallback();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        if (typeof onEndCallback === 'function') onEndCallback();
+      }
     }
 
     /* INITIALIZATION */
