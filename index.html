@@ -56,7 +56,7 @@
       gap: 5px;
       font-weight: 700;
       color: #00f5d4;
-      font-size: 0.62rem; /* Font diperkecil lagi */
+      font-size: 0.62rem;
     }
 
     .time-date-row #clockText {
@@ -66,7 +66,7 @@
       border-radius: 3px;
       border: 1px solid #00f5d4;
       font-family: monospace;
-      font-size: 0.65rem; /* Font diperkecil lagi */
+      font-size: 0.65rem;
     }
 
     /* DAFTAR WAKTU SHOLAT (EKSTRA RINGKAS) */
@@ -83,7 +83,7 @@
       padding: 1px 3px;
       border-radius: 3px;
       border: 1px solid rgba(212, 175, 55, 0.6);
-      font-size: 0.58rem; /* Font diperkecil lagi */
+      font-size: 0.58rem;
       cursor: pointer;
       transition: all 0.2s ease;
       user-select: none;
@@ -362,7 +362,7 @@
   </div>
 
   <div id="fullscreen-image-overlay" class="fullscreen-stage-overlay">
-    <img id="fullImagePlayer" src="STR1.jpg" alt="Gambar Fullscreen" onerror="this.src='STR1.jpg'">
+    <img id="fullImagePlayer" src="STR1.jpg" alt="Gambar Fullscreen" onerror="this.src='STR1.JPG'">
   </div>
 
   <div id="fullscreen-grid-overlay" class="fullscreen-stage-overlay">
@@ -374,6 +374,7 @@
     const IMAGE_DISPLAY_TIME = 5000;       
     const FULL_IMAGE_DISPLAY_TIME = 5000;  
     const GRID_DISPLAY_TIME = 10000;       
+    const SECTION_DURATION_MS = 30000;     // Diatur masing-masing 30 Detik untuk Kata-kata, Al-Quran, dan Tebak-tebakan
 
     let isAudioEnabled = false;
     let isAdzanPlaying = false;
@@ -413,14 +414,12 @@
         const month = today.getMonth() + 1;
         const date = today.getDate();
 
-        // Koordinat Kota Serang: Latitude -6.12, Longitude 106.15 dengan metode Kemenag RI (method=20)
         const response = await fetch(`https://api.aladhan.com/v1/timings/${date}-${month}-${year}?latitude=-6.12&longitude=106.15&method=20`);
         const result = await response.json();
 
         if (result && result.data && result.data.timings) {
           const t = result.data.timings;
           
-          // Format hh:mm
           document.getElementById('sholat-subuh').innerText = t.Fajr.substring(0, 5);
           document.getElementById('sholat-dzuhur').innerText = t.Dhuhr.substring(0, 5);
           document.getElementById('sholat-ashar').innerText = t.Asr.substring(0, 5);
@@ -516,7 +515,7 @@
       playSholawatDirectly();
     }
 
-    /* ROTASI TEKS 5 DETIK */
+    /* ROTASI TEKS */
     function startTextRotation(quotesArray) {
       stopTextRotation();
       let index = 0;
@@ -653,6 +652,7 @@
       }
     }
 
+    /* 1. KATA-KATA MOTIVASI (DURASI 30 DETIK) */
     function showQuotesSequence() {
       if (isAdzanPlaying) return;
 
@@ -671,24 +671,35 @@
       document.getElementById('dailyQuote').innerText = `"Setiap langkah kecil adalah fondasi menuju masa depan yang gemilang."`;
       document.getElementById('quoteRef').innerText = `- Kata Motivasi -`;
 
-      speakTextDirect("Setiap langkah kecil adalah fondasi menuju masa depan yang gemilang.", () => {
-        setTimeout(() => {
-          if (isAdzanPlaying) return;
+      speakTextDirect("Setiap langkah kecil adalah fondasi menuju masa depan yang gemilang.", () => {});
 
-          quoteScreen.className = 'fullscreen-stage-overlay show theme-quran';
-          document.getElementById('quoteCategory').innerText = "ARTI AYAT AL-QUR'AN";
-          document.getElementById('dailyQuote').innerText = `"Maka sesungguhnya bersama kesulitan ada kemudahan."`;
-          document.getElementById('quoteRef').innerText = `- QS. Ash-Sharh: 5 -`;
-
-          speakTextDirect("Maka sesungguhnya bersama kesulitan ada kemudahan.", () => {
-            setTimeout(() => {
-              if (!isAdzanPlaying) showBrainTeaserGame();
-            }, 3000);
-          });
-        }, 3000);
-      });
+      // Berjalan persis selama 30 detik sebelum lanjut ke Al-Quran
+      setTimeout(() => {
+        if (!isAdzanPlaying) showQuranSequence();
+      }, SECTION_DURATION_MS);
     }
 
+    /* 2. AL-QURAN EDUKASI (DURASI 30 DETIK) */
+    function showQuranSequence() {
+      if (isAdzanPlaying) return;
+
+      const quoteScreen = document.getElementById('fullscreen-quote-screen');
+      showStage(quoteScreen);
+
+      quoteScreen.className = 'fullscreen-stage-overlay show theme-quran';
+      document.getElementById('quoteCategory').innerText = "ARTI AYAT AL-QUR'AN";
+      document.getElementById('dailyQuote').innerText = `"Maka sesungguhnya bersama kesulitan ada kemudahan."`;
+      document.getElementById('quoteRef').innerText = `- QS. Ash-Sharh: 5 -`;
+
+      speakTextDirect("Maka sesungguhnya bersama kesulitan ada kemudahan.", () => {});
+
+      // Berjalan persis selama 30 detik sebelum lanjut ke Tebak-Tebakan
+      setTimeout(() => {
+        if (!isAdzanPlaying) showBrainTeaserGame();
+      }, SECTION_DURATION_MS);
+    }
+
+    /* 3. TEBAK-TEBAKAN / KUIZ (DURASI 30 DETIK) */
     function showBrainTeaserGame() {
       if (isAdzanPlaying) return;
 
@@ -706,14 +717,15 @@
 
       showStage(gameScreen);
 
-      speakTextDirect("Planet manakah yang dikenal sebagai Planet Merah?", () => {
-        setTimeout(() => {
-          if (!isAdzanPlaying) {
-            currentFullVideoIdx = 0;
-            showFullVideoStage();
-          }
-        }, 5000);
-      });
+      speakTextDirect("Planet manakah yang dikenal sebagai Planet Merah?", () => {});
+
+      // Berjalan persis selama 30 detik sebelum lanjut ke Video Fullscreen berikutnya
+      setTimeout(() => {
+        if (!isAdzanPlaying) {
+          currentFullVideoIdx = 0;
+          showFullVideoStage();
+        }
+      }, SECTION_DURATION_MS);
     }
 
     function showFullVideoStage() {
@@ -867,7 +879,7 @@
 
     /* INITIALIZATION */
     window.addEventListener('DOMContentLoaded', () => {
-      fetchPrayerTimesSerang(); // Mengambil waktu sholat akurat Kota Serang dari Kemenag/Bimas Islam
+      fetchPrayerTimesSerang(); 
       renderSideScreens();
       setupImageSlideshow('screen1', IMAGE_DISPLAY_TIME);
       setupImageSlideshow('screen3', IMAGE_DISPLAY_TIME);
